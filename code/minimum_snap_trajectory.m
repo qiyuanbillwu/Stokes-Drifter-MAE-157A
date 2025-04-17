@@ -7,21 +7,21 @@ m = 0.5;
 dt = 0.01;
 
 % conditions subject to our disposal, like start position
-x0 = 1.5;
-y0 = -1.5;
-z0 = -1.5;
+x0 = 1;
+y0 = -1;
+z0 = 1;
 x1 = -1.5;
 y1 = 0;
-z1 = 1.5;
-x2 = 1.5;
-y2 = 1.5;
-z2 = -1.5;
-vy = 2; % moving through the gate at this speed
+z1 = 2.5;
+x2 = 1;
+y2 = 1;
+z2 = 1;
+vy = 4.0; % moving through the gate at this speed
 T = 5; % apply some thrust to maintain orientation
 
 t0 = 0;
-t1 = 2;
-t2 = 4;
+t1 = 1.5;
+t2 = 3;
 
 % boundary conditions 
 % hovering at state 0 and 2, passing through the gate at state 1
@@ -56,6 +56,12 @@ f_v2 = @(t) [t-t t.^0 2*t.^1 3*t.^2 4*t.^3 5*t.^4 6*t.^5 7*t.^6] * a2;
 f_a1 = @(t) [t-t t-t 2*t.^0 6*t.^1 12*t.^2 20*t.^3 30*t.^4 42*t.^5] * a1;
 f_a2 = @(t) [t-t t-t 2*t.^0 6*t.^1 12*t.^2 20*t.^3 30*t.^4 42*t.^5] * a2;
 
+f_j1 = @(t) [t-t t-t t-t 6*t.^0 24*t.^1 60*t.^2 120*t.^3 210*t.^4] * a1;
+f_j2 = @(t) [t-t t-t t-t 6*t.^0 24*t.^1 60*t.^2 120*t.^3 210*t.^4] * a2;
+
+f_s1 = @(t) [t-t t-t t-t t-t 24*t.^0 120*t.^1 360*t.^2 840*t.^3] * a1;
+f_s2 = @(t) [t-t t-t t-t t-t 24*t.^0 120*t.^1 360*t.^2 840*t.^3] * a2;
+
 time1 = t0:dt:t1;
 time2 = t1:dt:t2;
 
@@ -65,6 +71,10 @@ v1 = f_v1(time1');
 v2 = f_v2(time2');
 a1 = f_a1(time1');
 a2 = f_a2(time2');
+j1 = f_j1(time1');
+j2 = f_j2(time2');
+s1 = f_s1(time1');
+s2 = f_s2(time2');
 
 x1 = r1(:,1);
 y1 = r1(:,2);
@@ -78,13 +88,14 @@ plot3(x1, y1, z1)
 hold on
 plot3(x2, y2, z2)
 hold off
-xlabel('x / m')
-ylabel('y / m')
-zlabel('z / m')
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
 xlim([-2 2])
 ylim([-2 2])
-zlim([-2 2])
+zlim([0 4])
 legend('1st leg', '2nd leg')
+grid on
 
 figure(2)
 plot(time1, x1, 'r')
@@ -96,8 +107,8 @@ plot(time2, y2, 'k')
 plot(time2, z2, 'b')
 hold off
 legend('x', 'y', 'z')
-xlabel('time / s')
-ylabel('position / m')
+xlabel('time (s)')
+ylabel('position (m)')
 
 figure(3)
 plot(time1, v1(:,1), 'r')
@@ -109,8 +120,8 @@ plot(time2, v2(:,2), 'k')
 plot(time2, v2(:,3), 'b')
 hold off
 legend('x', 'y', 'z')
-xlabel('time / s')
-ylabel('velocity / m')
+xlabel('time (s)')
+ylabel('velocity (m/s)')
 
 figure(4)
 plot(time1, a1(:,1), 'r')
@@ -122,17 +133,43 @@ plot(time2, a2(:,2), 'k')
 plot(time2, a2(:,3), 'b')
 hold off
 legend('x', 'y', 'z')
-xlabel('time / s')
-ylabel('acceleration / m')
+xlabel('time (s)')
+ylabel('acceleration (m/s^2)')
+
+figure(5)
+plot(time1, j1(:,1), 'r')
+hold on
+plot(time1, j1(:,2), 'k')
+plot(time1, j1(:,3), 'b')
+plot(time2, j2(:,1), 'r')
+plot(time2, j2(:,2), 'k')
+plot(time2, j2(:,3), 'b')
+hold off
+legend('x', 'y', 'z')
+xlabel('time (s)')
+ylabel('jerk (m/s^3)')
+
+figure(6)
+plot(time1, s1(:,1), 'r')
+hold on
+plot(time1, s1(:,2), 'k')
+plot(time1, s1(:,3), 'b')
+plot(time2, s2(:,1), 'r')
+plot(time2, s2(:,2), 'k')
+plot(time2, s2(:,3), 'b')
+hold off
+legend('x', 'y', 'z')
+xlabel('time (s)')
+ylabel('snap (m/s^4)')
 
 T_over_W_1 = sqrt(a1(:,1).^2 + a1(:,2).^2 + (a1(:,3)+g).^2) / g;
 T_over_W_2 = sqrt(a2(:,1).^2 + a2(:,2).^2 + (a2(:,3)+g).^2) / g;
 
-figure(5)
+figure(7)
 plot(time1, T_over_W_1);
 hold on
 plot(time2, T_over_W_2);
 hold off
-xlabel('time / s')
+xlabel('time (s)')
 ylabel('thrust to weight ratio')
 legend('1st leg', '2nd leg')
