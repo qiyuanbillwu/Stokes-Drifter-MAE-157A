@@ -135,3 +135,4 @@ plot(time2, T_over_W_2);
 hold off
 xlabel('time / s')
 ylabel('thrust to weight ratio')
+legend('1st leg', '2nd leg')
