@@ -70,19 +70,25 @@ dyn = dynamics.dynamics(np.array([g,m]), dt)
 data = np.append(t,state)
 data = np.append(data,f)
 
-# Desired position (hover point)
-xd, yd, zd = 0.0, 0.0, 1.0  # meters
-
 
 # Simulation loop
 running = True
 while running:
     # Get new desired state from trajectory planner
     # xd, yd, zd, ... = get_desired_state(t)
+    #example
+
+    xd, yd, zd = 0.0, 0.0, 1.0  # meters
+    xdot, ydot, zdot = 0.0, 0.0, 0.0 
+
+    trajectory = {
+    'position': [xd, yd, zd],  # Desired position at current time step
+    'velocity': [xdot, ydot, zdot],  # Desired velocity at current time step
+    }
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
-    T, phi_des, theta_des, psi_des = outer_loop_controller(state, xd, yd, zd, mass=m, g=g)
+    T, phi_des, theta_des, psi_des = outer_loop_controller(state, trajectory, mass=m, g=g)
 
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller
