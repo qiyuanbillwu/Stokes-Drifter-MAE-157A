@@ -88,12 +88,12 @@ while running:
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
-    T, phi_des, theta_des, psi_des = outer_loop_controller(state, trajectory, mass=m, g=g)
+    T = outer_loop_controller(state, trajectory, mass=m, g=g)
 
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller
     
-    f = inner_loop_controller(state, T, phi_des, theta_des, psi_des, l=l, c=c, J=J, quat_to_rot_func=dyn.quat_to_rot)
+    f = inner_loop_controller(state, q_des, omega_des, T, l, c)
 
     # Propagate dynamics with control inputs
     state = dyn.propagate(state, f, dt)
