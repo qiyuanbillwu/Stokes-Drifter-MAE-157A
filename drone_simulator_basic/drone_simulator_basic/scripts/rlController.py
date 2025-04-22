@@ -55,7 +55,24 @@ def outer_loop_controller(state, trajectory, mass, g):
     # Compute the desired thrust (along the z-axis)
     T = mass * np.linalg.norm(a)
 
-    return T
+    a_hat = a / (np.linalg.norm(a))
+    e3_hat = np.array([0.0, 0.0, 1.0])
+
+    cross_part = np.cross(e3_hat, a_hat) 
+    cross_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * cross_part
+
+    first_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * (1 + e3_hat.T * a_hat)
+
+    q_des = np.array([first_part, cross_part[0], cross_part[1], cross_part[2]])
+
+    R_d = quat_to_rot(q_des)
+
+    #placeholder
+    adot_hat = np.array([0, 0, 0])
+
+    omega_des = R_d.T @ adot_hat
+
+    return T, q_des, omega_des
 
 def inner_loop_controller(state, q_des, omega_des, T, l, c):
     # Extract current quaternion and angular velocity
