@@ -8,11 +8,14 @@ import numpy as np
 class dynamics: 
 	def __init__(self, params, dt):
 		# Initialize Params (Need to add more!)
-		self.g = params[0]
-		self.m = params[1]
-		# self.J = ... Inertia Tensor
-		# self.l = ... Moment Arm
-		# self.c = ... Propeller Drag Coefficient
+		self.g = params[0];
+		self.m = params[1];
+		self.l = params[2];
+		self.Cd = params[3]; # Propeller Drag Coefficient
+		self.Cl = params[4]; # Propeller Lift Coefficient
+		self.J = params[5]; 
+	
+		self.d = self.Cd / self.Cl; # Ratio of lift to torque
 
 	# This is meant to give the rates of each state
 	def rates(self, state, f):
@@ -21,12 +24,8 @@ class dynamics:
 		w = [state[10], state[11], state[12]];
 
 		# Get thrust from motor forces f
-		T = f[0] + f[1] + f[2] + f[3];
-
-		AllocationMatrix = np.array([
-			
-		])
-		torque = np.matmul(AllocationMatrix, f);
+		A = self.allocation_matrix(self.l,self.d);
+		[T,tauX,tauY,tauZ] = np.matmul(A,f);
 		
 		# Velocities
 		dx = state[3]
@@ -47,14 +46,13 @@ class dynamics:
 		dqz = dq[3];
 
 		# Angular Velocities
-		Jinv = np.linalg.inv(J)
-		dw = np.matmul(Jinv, (np.cross(-w,np.matmul(J,w)) + torque));
-		# dwx = Jinv * ...
-		# dwy = Jinv * ...
-		# dwz = Jinv * ...
+		Jinv = np.linalg.inv(self.J)
+		dw = np.matmul(Jinv, (np.cross(-w,np.matmul(self.J,w)) + [tauX, tauY, tauZ]));
+		dwx = dw[0];
+		dwy = dw[1];
+		dwz = dw[2];
 
-		res = np.array([dx, dy, dz, dvx, dvy, dvz, dqw, dqx, dqy, dqz, dwx, dwy, dwz])
-
+		res = np.array([dx, dy, dz, dvx, dvy, dvz, dqw, dqx, dqy, dqz, dwx, dwy, dwz]);
 		return res
 
 	# Numerical integration scheme (can do better than Euler!)
@@ -168,3 +166,23 @@ class dynamics:
 			[ vz,   0,  -vx],
 			[-vy,  vx,   0 ]
 		])
+	
+	def allocation_matrix(l,d):
+		#  Front
+        #    ^
+        #    |
+        # 1      2
+        #    |
+        # 4      3
+
+		# 1 CCW
+		# 2 CW
+		# 3 CCW
+		# 4 CW
+
+		return np.array([
+        [1, 1, 1, 1],        # Total thrust
+        [-l, l, l, -l],      # Roll
+        [l, l, -l, -l],      # Pitch
+        [d, -d, d, -d]       # Yaw
+    	])

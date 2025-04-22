@@ -61,18 +61,18 @@ rate = 500
 dt = 1./rate
 
 # Gravity
-g = 9.8
+g = 9.81
 
 # Other parameters?
 #placeholder for now
-m = 10 #mass of drone
-l = 0.2  # meters
-c = 0.01 # drag coefficient
-J = np.diag([0.005, 0.005, 0.009])
-
+m = 0.     # mass of drone [kg]
+l = 0.115  # meters [m]
+Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
+Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
+J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
 
 # Initialize dynamics
-dyn = dynamics.dynamics(np.array([g,m]), dt)
+dyn = dynamics.dynamics(np.array([g,m,l,Cd,Cl,J]), dt)
 
 # Initialize data array that contains useful info (probably should add more)
 data = np.append(t,state)
