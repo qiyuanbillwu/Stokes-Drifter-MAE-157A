@@ -13,7 +13,7 @@ class dynamics:
 		self.l = params[2];
 		self.Cd = params[3]; # Propeller Drag Coefficient
 		self.Cl = params[4]; # Propeller Lift Coefficient
-		self.J = params[5]; 
+		self.J = np.diag([params[5],params[6],params[7]]); 
 	
 		self.d = self.Cd / self.Cl; # Ratio of lift to torque
 
@@ -21,7 +21,7 @@ class dynamics:
 	def rates(self, state, f):
 		# Get rotation matrix from current quaterion
 		R = self.quat_to_rot([state[6], state[7], state[8], state[9]])
-		w = [state[10], state[11], state[12]];
+		w = np.array([state[10], state[11], state[12]]);
 
 		# Get thrust from motor forces f
 		A = self.allocation_matrix(self.l,self.d);
@@ -36,6 +36,9 @@ class dynamics:
 		dvx = R[0,2] * T  / self.m
 		dvy = R[1,2] * T  / self.m
 		dvz = R[2,2] * T  / self.m - self.g
+		#print("Rotation Matrix = ", R)
+		#print("Thrust = ", T)
+		#print("Mass = ", self.m)
 
 		# Orientation
 		Rdot = np.matmul(R, self.cross_matrix(w));
@@ -84,7 +87,7 @@ class dynamics:
 
 	# Helper function that converts a quaternion to rotation matrix
 	# https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion
-	def quat_to_rot(q):
+	def quat_to_rot(self, q):
 		"""
 		Converts a quaternion (qw, qx, qy, qz) into a 3x3 rotation matrix.
 		"""
@@ -106,7 +109,7 @@ class dynamics:
 
 		return R
 
-	def rot_to_quat(R):
+	def rot_to_quat(self, R):
 		"""
 		Convert a 3x3 rotation matrix to a unit quaternion (qw, qx, qy, qz).
 
@@ -149,7 +152,7 @@ class dynamics:
 		quat = np.array([qw, qx, qy, qz])
 		return quat / np.linalg.norm(quat)  # Ensure unit quaternion
 	
-	def cross_matrix(v):
+	def cross_matrix(self, v):
 		"""
 		Returns the skew-symmetric cross-product matrix of a 3D vector v.
 		
@@ -167,7 +170,7 @@ class dynamics:
 			[-vy,  vx,   0 ]
 		])
 	
-	def allocation_matrix(l,d):
+	def allocation_matrix(self,l,d):
 		#  Front
         #    ^
         #    |
