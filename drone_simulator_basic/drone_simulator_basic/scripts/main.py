@@ -25,25 +25,33 @@ state = np.zeros(13)
 f = np.zeros(4)
 
 # x, y, z
+# Zero Position
 state[0] = x0
 state[1] = y0
 state[2] = z0
 
 # vx, vy, vz
+# Zero Velocity
 state[3] = 0.
 state[4] = 0.
 state[5] = 0.
 
 # qw, qx, qy, qz
+# Initially 'upright' position
 state[6] = 1.
 state[7] = 0.
 state[8] = 0.
 state[9] = 0.
 
 # wx, wy, wz
+# Zero Initial Angular Velocity
 state[10] = 0.
 state[11] = 0.
 state[12] = 0.
+
+# Summary of States Array
+# state = [posX, posY, posZ, velX, velY, velZ, qw, qx, qy, qz, wx, wy, wz]
+# index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
 tf = 10.
@@ -121,7 +129,3 @@ if save_data:
     date_time_string = now.strftime("%Y-%m-%d_%H-%M-%S")
     file_name = f"data_{date_time_string}.csv"
     np.savetxt("../data/"+file_name, data, delimiter=",")
-
-
-
-
