@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# compute the matrix to solve polynomial coeffcient 
 def compute_A(t0, t1):
     A = np.zeros((8, 8))
     for col in range(8):
@@ -16,8 +17,6 @@ def compute_A(t0, t1):
             A[3, col] = col * (col - 1) * (col - 2) * t0**(col - 3)
             A[7, col] = col * (col - 1) * (col - 2) * t1**(col - 3)
     return A
-
-
 
 # global constants
 g = 9.81
@@ -59,6 +58,7 @@ a2 = np.linalg.solve(A2, b2)
 
 #print(a1)
 
+# compute the cross product matrix from a vector
 def cross_product_matrix(a):
     m = np.zeros((3,3))
     m[0,1] = -a[2]
@@ -70,6 +70,8 @@ def cross_product_matrix(a):
 
     return m
 
+# gets the current state at time t, using the trajectory kinematics
+# outputs position, velocity, accelration, jerk, snap, quarternion, angular velocity, angular acceleration
 def get_state(t):
     if t < t0 or t > t2:
         print("time must be within range")
@@ -83,6 +85,7 @@ def get_state(t):
     T_d_hat = np.array([0, 0, 1])
     I = np.identity(3)
 
+    # calculate the kinematics at current time
     r = np.array([t**0, t**1, t**2, t**3, t**4, t**5, t**6, t**7]) @ a_coeff
     v = np.array([0, 1, 2*t, 3*t**2, 4*t**3, 5*t**4, 6*t**5, 7*t**6]) @ a_coeff
     a = np.array([0, 0, 2, 6*t, 12*t**2, 20*t**3, 30*t**4, 42*t**5]) @ a_coeff
@@ -96,7 +99,7 @@ def get_state(t):
     theta = np.arccos(np.dot(T_d_hat, a_d_hat))
     # print("theta: ", theta)
 
-    if t == t0 or t == t2:
+    if t == t0 or t == t2:  # accounts for when the denominator is 0 
         n_hat = np.array([0, 0, 1])
         w = np.array([0, 0, 0])
         wdot = np.array([0, 0, 0])
@@ -126,7 +129,7 @@ def get_state(t):
     # print("r: ", r)
     # print("v: ", v)
     # print("a: ", a)
-    #print(a_d)
+    # print(a_d)
     # print("a_d_hat: ", a_d_hat)
     # print("jerk: ", j)
     # print("snap: ", s)
@@ -134,9 +137,10 @@ def get_state(t):
     state = {
         "r": r,         # position
         "v": v,         # velocity
-        "q": q_d,         # quarternion
+        "q": q_d,       # quarternion
         "w": w,         # angular velocity
         "wdot": wdot,   # angular acceleration
+        "a": a,         # acceleration
         "j": j,         # jerk
         "s": s          # snap
     }
@@ -144,4 +148,4 @@ def get_state(t):
 
     return state
 
-# get_state(1.5)
+get_state(1.5)
