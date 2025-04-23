@@ -1,5 +1,32 @@
 
 import numpy as np
+from dynamics import quat_to_rot
+
+#must always account for double covering with quaternions to prevent unwinding
+
+def quat_multiply(q1, q2):
+    # Hamilton product of two quaternions
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    return np.array([
+        w1*w2 - x1*x2 - y1*y2 - z1*z2,
+        w1*x2 + x1*w2 + y1*z2 - z1*y2,
+        w1*y2 - x1*z2 + y1*w2 + z1*x2,
+        w1*z2 + x1*y2 - y1*x2 + z1*w2
+    ])
+
+def quat_conjugate(q):
+    w, x, y, z = q
+    return np.array([w, -x, -y, -z])
+
+def quaternion_error(q_des, q_curr):
+    # Compute q_e = q_des^* ⊗ q_curr
+    return quat_multiply(quat_conjugate(q_des), q_curr)
+
+def qdot_from_omega(q, omega):
+    """Compute q_dot from quaternion q and angular velocity omega"""
+    omega_quat = np.array([0, *omega])
+    return 0.5 * quat_multiply(q, omega_quat)
 
 #get thrust and desired orientation
 def outer_loop_controller(state, trajectory, mass, g):
@@ -9,65 +36,87 @@ def outer_loop_controller(state, trajectory, mass, g):
 
     # Extract desired position and velocity from trajectory at current time step
     xd, yd, zd = trajectory['position']
-    xdot, ydot, zdot = trajectory['velocity']
+    vxdes, vydes, vzdes = trajectory['velocity']
+    axdes, aydes, azdes = trajectory['acceleration']
 
     # Position and velocity errors
     e_pos = np.array([xd, yd, zd]) - pos
-    e_vel = np.array([xdot, ydot, zdot]) - vel
+    e_vel = np.array([vxdes, vydes, vzdes]) - vel
 
     # PID gains for position control
-    Kp_pos = np.array([1.5, 1.5, 10.0])  # Adjust these gains as necessary
-    Kd_pos = np.array([1.0, 1.0, 5.0])  # Adjust these gains as necessary
+    Kp = np.array([1.5, 1.5, 10.0])  # Adjust these gains as necessary
+    Kd = np.array([1.0, 1.0, 5.0])  # Adjust these gains as necessary
+
+    accel_des = np.array([axdes, aydes, azdes])
 
     # Desired acceleration
-    a_des = Kp_pos * e_pos + Kd_pos * e_vel + np.array([0, 0, g])   
+    a = accel_des - Kp * e_pos - Kd * e_vel + np.array([0, 0, g])   
 
     # Compute the desired thrust (along the z-axis)
-    T = mass * a_des[2]
+    T = mass * np.linalg.norm(a)
 
-    # Desired roll and pitch (based on desired horizontal accelerations)
-    phi_des = -a_des[1] / g
-    theta_des = a_des[0] / g
-    psi_des = 0.0  # You can adjust the yaw if necessary (for an angled gate, if needed)
+    a_hat = a / (np.linalg.norm(a))
+    e3_hat = np.array([0.0, 0.0, 1.0])
 
-    return T, phi_des, theta_des, psi_des
+    cross_part = np.cross(e3_hat, a_hat) 
+    cross_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * cross_part
 
-def inner_loop_controller(state, T, phi_des, theta_des, psi_des, l, c, J, quat_to_rot_func):
-    # Extract current orientation and angular velocity
-    qw, qx, qy, qz = state[6:10]
-    omega = state[10:13]
+    first_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * (1 + e3_hat.T * a_hat)
 
-    # Convert quaternion to rotation matrix
-    R = quat_to_rot_func([qw, qx, qy, qz])
+    q_des = np.array([first_part, cross_part[0], cross_part[1], cross_part[2]])
 
-    # Extract current Euler angles (phi, theta, psi)
-    phi = np.arctan2(R[2, 1], R[2, 2])
-    theta = -np.arcsin(R[2, 0])
-    psi = np.arctan2(R[1, 0], R[0, 0])
+    R_d = quat_to_rot(q_des)
 
-    # Orientation and angular velocity errors
-    e_ang = np.array([phi_des - phi, theta_des - theta, psi_des - psi])
-    e_omega = -omega
+    #placeholder
+    adot_hat = np.array([0, 0, 0])
 
-    # PD gains for angular control
-    Kp_ang = np.array([8.0, 8.0, 3.0])
-    Kd_ang = np.array([1.5, 1.5, 0.8])
+    omega_des = R_d.T @ adot_hat
 
-    # Compute the desired torques
-    tau = Kp_ang * e_ang + Kd_ang * e_omega
+    return T, q_des, omega_des
 
-    # Mixing matrix to convert thrust and torques to motor forces
+def inner_loop_controller(state, q_des, omega_des, T, l, c):
+    # Extract current quaternion and angular velocity
+    q_curr = state[6:10]       # [w, x, y, z]
+    omega = state[10:13]       # [wx, wy, wz]
+
+    # Orientation error quaternion: q_e = q_des^* ⊗ q_curr
+    q_e = quaternion_error(q_des, q_curr)
+
+    # PD gains
+    Kp = np.array([8.0, 8.0, 3.0])
+    Kd = np.array([1.5, 1.5, 0.8])   
+
+    Lambda = np.array([0.5, 0.5, 0.3])
+
+    # Sign correction to avoid unwinding
+    s = np.sign(q_e[0]) if q_e[0] != 0 else 1
+
+    # Rotation matrix from desired quaternion (for omega_d transformation)
+    R_e = quat_to_rot(q_e)
+    
+    # Angular velocity error
+    omega_e = omega - R_e @ omega_des
+
+    q_dot_e = qdot_from_omega(q_des, omega_e)
+
+
+    # Control torque
+    tau = -s * Kp * q_e[1:] - Kd * omega_e - Lambda * s * q_dot_e[1:]
+
+
+
+    # Mixer matrix to solve for motor forces
     mix = np.array([
-        [1, 1, 1, 1],  # Total thrust
-        [l, -l, -l, l],  # Roll
-        [-l, -l, l, l],  # Pitch
-        [c, -c, c, -c]  # Yaw
+        [1, 1, 1, 1],     # Total thrust
+        [l, -l, -l, l],   # Roll
+        [-l, -l, l, l],   # Pitch
+        [c, -c, c, -c]    # Yaw
     ])
 
-    # Full control vector (thrust + torques)
+    # Combine total thrust and torques
     tau_full = np.array([T, *tau])
 
-    # Solve for motor forces (f1, f2, f3, f4)
+    # Solve for motor forces
     f = np.linalg.solve(mix, tau_full)
 
     return f
