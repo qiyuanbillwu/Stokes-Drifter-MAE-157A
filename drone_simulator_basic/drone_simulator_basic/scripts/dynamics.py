@@ -20,12 +20,14 @@ class dynamics:
 	# This is meant to give the rates of each state
 	def rates(self, state, f):
 		# Get rotation matrix from current quaterion
-		R = self.quat_to_rot([state[6], state[7], state[8], state[9]])
+		q = [state[6], state[7], state[8], state[9]];
+		R = self.quat_to_rot(q);
 		w = np.array([state[10], state[11], state[12]]);
 
 		# Get thrust from motor forces f
 		A = self.allocation_matrix(self.l,self.d);
 		[T,tauX,tauY,tauZ] = np.matmul(A,f);
+		#print(T,tauX,tauY,tauZ);
 		
 		# Velocities
 		dx = state[3]
@@ -41,8 +43,10 @@ class dynamics:
 		#print("Mass = ", self.m)
 
 		# Orientation
-		Rdot = np.matmul(R, self.cross_matrix(w));
-		dq = self.rot_to_quat(Rdot);
+		#Rdot = np.matmul(R, self.cross_matrix(w));
+		#dq = self.rot_to_quat(Rdot);
+		dq = 0.5 * self.quatmul(q, [0, w[0], w[1], w[2]])
+		
 		dqw = dq[0];
 		dqx = dq[1];
 		dqy = dq[2];
@@ -85,6 +89,26 @@ class dynamics:
 		state += (dt / 6.0) * (k1 + 2*k2 + 2*k3 + k4)
 		return state
 
+	def quatmul(self, q, r):
+		"""
+		Multiply two quaternions: q ⊗ r
+
+		Parameters:
+			q, r: array-like or np.ndarray of shape (4,) in (w, x, y, z) format
+
+		Returns:
+			np.ndarray: The resulting quaternion (w, x, y, z)
+		"""
+		qw, qx, qy, qz = q
+		rw, rx, ry, rz = r
+
+		return np.array([
+			qw*rw - qx*rx - qy*ry - qz*rz,
+			qw*rx + qx*rw + qy*rz - qz*ry,
+			qw*ry - qx*rz + qy*rw + qz*rx,
+			qw*rz + qx*ry - qy*rx + qz*rw
+		])
+	
 	# Helper function that converts a quaternion to rotation matrix
 	# https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion
 	def quat_to_rot(self, q):
