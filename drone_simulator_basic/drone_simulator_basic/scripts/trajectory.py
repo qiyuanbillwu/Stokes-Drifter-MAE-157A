@@ -59,6 +59,17 @@ a2 = np.linalg.solve(A2, b2)
 
 #print(a1)
 
+def cross_product_matrix(a):
+    m = np.zeros((3,3))
+    m[0,1] = -a[2]
+    m[0,2] = a[1]
+    m[1,2] = -a[0]
+    m[1,0] = -m[0,1]
+    m[2,0] = -m[0,2]
+    m[2,1] = -m[1,2]
+
+    return m
+
 def get_state(t):
     if t < t0 or t > t2:
         print("time must be within range")
@@ -69,13 +80,68 @@ def get_state(t):
 
     #print(a_coeff)
 
+    T_d_hat = np.array([0, 0, 1])
+    I = np.identity(3)
+
     r = np.array([t**0, t**1, t**2, t**3, t**4, t**5, t**6, t**7]) @ a_coeff
     v = np.array([0, 1, 2*t, 3*t**2, 4*t**3, 5*t**4, 6*t**5, 7*t**6]) @ a_coeff
     a = np.array([0, 0, 2, 6*t, 12*t**2, 20*t**3, 30*t**4, 42*t**5]) @ a_coeff
+    j = np.array([0, 0, 0, 6, 24*t, 60*t**2, 120*t**3, 210*t**4]) @ a_coeff 
+    s = np.array([0, 0, 0, 0, 24, 120*t, 360*t**2, 840*t**3]) @ a_coeff 
 
-    state = np.concatenate((r, v, a))
-    print(state)
+    a_d = a + np.array([0 ,0, g])
+    #print("a_d: ", a_d)
+    #print("norm(a_d): ", np.linalg.norm(a_d))
+    a_d_hat = a_d / np.linalg.norm(a_d)
+    theta = np.arccos(np.dot(T_d_hat, a_d_hat))
+    # print("theta: ", theta)
+
+    if t == t0 or t == t2:
+        n_hat = np.array([0, 0, 1])
+        w = np.array([0, 0, 0])
+        wdot = np.array([0, 0, 0])
+        q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
+    else: 
+        n = np.cross(T_d_hat, a_d_hat)
+        # print('n: ', n)
+        n_hat = n / np.linalg.norm(n)
+
+        # print("n_hat: ", n_hat)
+        n_cross = cross_product_matrix(n_hat)
+        R_d = I + np.sin(theta) * n_cross + (1-np.cos(theta)) * n_cross @ n_cross 
+        q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
+        # print("quarternion: ", q_d)
+
+        a_hat_dot = j / np.linalg.norm(a) - a * (np.transpose(a) @ j) / np.linalg.norm(a)**3
+        w = np.transpose(R_d) @ a_hat_dot
+        # print("a_hat_dot: ", a_hat_dot)
+
+        a_hat_doubledot = s / np.linalg.norm(a) - (2 * j * (np.transpose(a) @ j) + a * (np.transpose(j) @ j + np.transpose(a) @ s)) / np.linalg.norm(a)**3 
+        + 3 * a * (np.transpose(a) @ j)**2 / np.linalg.norm(a)**5
+        wdot = np.transpose(R_d) @ a_hat_doubledot - cross_product_matrix(w) @ np.transpose(R_d) @ a_hat_dot
+
+    # print("w: ", w)
+    # print("wdot: ", wdot)
+
+    # print("r: ", r)
+    # print("v: ", v)
+    # print("a: ", a)
+    #print(a_d)
+    # print("a_d_hat: ", a_d_hat)
+    # print("jerk: ", j)
+    # print("snap: ", s)
+
+    state = {
+        "r": r,         # position
+        "v": v,         # velocity
+        "q": q_d,         # quarternion
+        "w": w,         # angular velocity
+        "wdot": wdot,   # angular acceleration
+        "j": j,         # jerk
+        "s": s          # snap
+    }
+    # print(state)
 
     return state
 
-get_state(1.49)
+# get_state(1.5)
