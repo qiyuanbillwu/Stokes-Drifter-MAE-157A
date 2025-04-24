@@ -1,6 +1,6 @@
 
 import numpy as np
-from dynamics import quat_to_rot
+import dynamics as dyn
 
 #must always account for double covering with quaternions to prevent unwinding
 
@@ -35,9 +35,9 @@ def outer_loop_controller(state, trajectory, mass, g):
     vel = state[3:6]
 
     # Extract desired position and velocity from trajectory at current time step
-    xd, yd, zd = trajectory['position']
-    vxdes, vydes, vzdes = trajectory['velocity']
-    axdes, aydes, azdes = trajectory['acceleration']
+    xd, yd, zd = trajectory['r']
+    vxdes, vydes, vzdes = trajectory['v']
+    axdes, aydes, azdes = trajectory['a']
 
     # Position and velocity errors
     e_pos = np.array([xd, yd, zd]) - pos
@@ -65,16 +65,16 @@ def outer_loop_controller(state, trajectory, mass, g):
 
     q_des = np.array([first_part, cross_part[0], cross_part[1], cross_part[2]])
 
-    R_d = quat_to_rot(q_des)
+    R_d = dyn.quat_to_rot(q_des)
 
     #placeholder
-    adot_hat = np.array([0, 0, 0])
+    adot_hat = trajectory['j']
 
     omega_des = R_d.T @ adot_hat
 
     return T, q_des, omega_des
 
-def inner_loop_controller(state, q_des, omega_des, T, l, c):
+def inner_loop_controller(state, q_des, omega_des, T, l, d):
     # Extract current quaternion and angular velocity
     q_curr = state[6:10]       # [w, x, y, z]
     omega = state[10:13]       # [wx, wy, wz]
@@ -92,7 +92,7 @@ def inner_loop_controller(state, q_des, omega_des, T, l, c):
     s = np.sign(q_e[0]) if q_e[0] != 0 else 1
 
     # Rotation matrix from desired quaternion (for omega_d transformation)
-    R_e = quat_to_rot(q_e)
+    R_e = dyn.quat_to_rot(q_e)
     
     # Angular velocity error
     omega_e = omega - R_e @ omega_des
@@ -107,10 +107,10 @@ def inner_loop_controller(state, q_des, omega_des, T, l, c):
 
     # Mixer matrix to solve for motor forces
     mix = np.array([
-        [1, 1, 1, 1],     # Total thrust
-        [l, -l, -l, l],   # Roll
-        [-l, -l, l, l],   # Pitch
-        [c, -c, c, -c]    # Yaw
+        [1, 1, 1, 1],        # Total thrust
+        [-l, l, l, -l],      # Roll
+        [l, l, -l, -l],      # Pitch
+        [d, -d, d, -d]       # Yaw
     ])
 
     # Combine total thrust and torques
