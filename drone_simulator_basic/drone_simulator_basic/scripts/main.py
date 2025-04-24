@@ -10,6 +10,7 @@ import datetime
 ### Import custom modules and classes ###
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
+from trajectory import get_state
 
 ##########################################
 ############ Drone Simulation ############
@@ -26,9 +27,12 @@ f = np.zeros(4)
 
 # x, y, z
 # Zero Position
-state[0] = x0
-state[1] = y0
-state[2] = z0
+
+#assuming start from 0,0,0
+
+state[0] = 0
+state[1] = 0
+state[2] = 0
 
 # vx, vy, vz
 # Zero Velocity
@@ -65,7 +69,7 @@ g = 9.81
 
 # Other parameters?
 #placeholder for now
-m = 0.     # mass of drone [kg]
+m = 10.0     # mass of drone [kg]
 l = 0.115  # meters [m]
 Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
 Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
@@ -84,15 +88,8 @@ running = True
 while running:
     # Get new desired state from trajectory planner
     # xd, yd, zd, ... = get_desired_state(t)
-    #example
 
-    xd, yd, zd = 0.0, 0.0, 1.0  # meters
-    xdot, ydot, zdot = 0.0, 0.0, 0.0 
-
-    trajectory = {
-    'position': [xd, yd, zd],  # Desired position at current time step
-    'velocity': [xdot, ydot, zdot],  # Desired velocity at current time step
-    }
+    trajectory = get_state(t)
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
@@ -101,7 +98,7 @@ while running:
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller
     
-    f = inner_loop_controller(state, q_des, omega_des, T, l, c)
+    f = inner_loop_controller(state, q_des, omega_des, T, l, dyn.d)
 
     # Propagate dynamics with control inputs
     state = dyn.propagate(state, f, dt)
