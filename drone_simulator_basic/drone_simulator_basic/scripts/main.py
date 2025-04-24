@@ -6,6 +6,9 @@
 ### Import python packages ###
 import numpy as np
 import datetime
+import os
+
+print("Current Working Directory:", os.getcwd())
 
 ### Import custom modules and classes ###
 import dynamics
@@ -17,10 +20,10 @@ from trajectory import get_state
 ##########################################
 
 # Save data flag
-save_data = False
+save_data = True
 
 # Initial conditions
-t = 0.
+t = 0.0
 
 state = np.zeros(13)
 f = np.zeros(4)
@@ -28,11 +31,11 @@ f = np.zeros(4)
 # x, y, z
 # Zero Position
 
-#assuming start from 0,0,0
+#assuming start from 0,0,1
 
 state[0] = 0
 state[1] = 0
-state[2] = 0
+state[2] = 1
 
 # vx, vy, vz
 # Zero Velocity
@@ -58,7 +61,7 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 10.
+tf = 10.0
 
 # Simulation rate
 rate = 500
@@ -76,7 +79,7 @@ Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
 J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
 
 # Initialize dynamics
-dyn = dynamics.dynamics(np.array([g,m,l,Cd,Cl,J]), dt)
+dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 
 # Initialize data array that contains useful info (probably should add more)
 data = np.append(t,state)
@@ -101,6 +104,8 @@ while running:
     f = inner_loop_controller(state, q_des, omega_des, T, l, dyn.d)
 
     # Propagate dynamics with control inputs
+    #print(state.shape)
+    #print(f.shape)
     state = dyn.propagate(state, f, dt)
  
     # If z to low then indicate crash and end simulation
@@ -117,6 +122,7 @@ while running:
     t += dt 
 
     # If time exceeds final time then stop simulator
+    print(t)
     if t >= tf:
         running = False
 
@@ -125,4 +131,8 @@ if save_data:
     now = datetime.datetime.now()
     date_time_string = now.strftime("%Y-%m-%d_%H-%M-%S")
     file_name = f"data_{date_time_string}.csv"
+
+    file_path = os.path.abspath("../data/" + file_name)
+    print("Saving to:", file_path)
+
     np.savetxt("../data/"+file_name, data, delimiter=",")

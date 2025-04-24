@@ -1,7 +1,6 @@
 
 import numpy as np
-import dynamics as dyn
-
+from util import quat_to_rot
 #must always account for double covering with quaternions to prevent unwinding
 
 def quat_multiply(q1, q2):
@@ -61,11 +60,11 @@ def outer_loop_controller(state, trajectory, mass, g):
     cross_part = np.cross(e3_hat, a_hat) 
     cross_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * cross_part
 
-    first_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * (1 + e3_hat.T * a_hat)
+    first_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * (1 + e3_hat.T @ a_hat)
 
     q_des = np.array([first_part, cross_part[0], cross_part[1], cross_part[2]])
 
-    R_d = dyn.quat_to_rot(q_des)
+    R_d = quat_to_rot(q_des)
 
     #placeholder
     adot_hat = trajectory['j']
@@ -92,7 +91,7 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     s = np.sign(q_e[0]) if q_e[0] != 0 else 1
 
     # Rotation matrix from desired quaternion (for omega_d transformation)
-    R_e = dyn.quat_to_rot(q_e)
+    R_e = quat_to_rot(q_e)
     
     # Angular velocity error
     omega_e = omega - R_e @ omega_des
