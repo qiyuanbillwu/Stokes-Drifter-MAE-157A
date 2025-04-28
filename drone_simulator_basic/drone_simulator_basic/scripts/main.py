@@ -61,7 +61,7 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 10.0
+tf = 3.0
 
 # Simulation rate
 rate = 500
@@ -72,7 +72,7 @@ g = 9.81
 
 # Other parameters?
 #placeholder for now
-m = 10.0     # mass of drone [kg]
+m = 0.5     # mass of drone [kg]
 l = 0.115  # meters [m]
 Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
 Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
