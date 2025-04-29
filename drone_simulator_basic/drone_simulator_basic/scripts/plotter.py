@@ -4,12 +4,15 @@ import matplotlib.pyplot as plt
 from trajectory import get_state
 
 # Update with actual file name in the data director
-file_name = "data_2025-04-28_14-29-03.csv"
+file_name = "data_2025-04-29_10-15-10.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../data/"+file_name, delimiter=',')
 print(data)
 
+## UPDATE, used for equillibrium force calc
+m = 0.7437
+g = 9.81
 
 t = data[:, 0]
 x = data[:, 1]
@@ -18,6 +21,11 @@ z = data[:, 3]
 vx = data[:, 4]
 vy = data[:, 5]
 vz = data[:, 6]
+
+f1 = data[:, 14]
+f2 = data[:, 15]
+f3 = data[:, 16]
+f4 = data[:, 17]
 
 # initialize empty arrays
 xd, yd, zd = [], [], []
@@ -51,8 +59,24 @@ plt.title('Position vs Time')
 plt.legend()
 plt.grid()
 
-# --- 3D Drone Trajectory ---
+# -- Motor Forces vs. Time --
+plt.figure(101)
+plt.plot(t, f1, label="f1 [N]");
+plt.plot(t, f2, label="f2 [N]");
+plt.plot(t, f3, label="f3 [N]");
+plt.plot(t, f4, label="f4 [N]");
+plt.title("Motor Forces")
+plt.xlabel("Force [N]");
+plt.ylabel("Time [s]");
 
+equForce = np.ones(len(t)) * (m*g / 4);
+plt.plot(t, equForce, label="Hovering Force [N]");
+
+plt.legend();
+
+# Legend
+
+# --- 3D Drone Trajectory ---
 fig = plt.figure(2)
 ax = fig.add_subplot(111, projection='3d')
 ax.plot(x, y, z, label='Drone trajectory')

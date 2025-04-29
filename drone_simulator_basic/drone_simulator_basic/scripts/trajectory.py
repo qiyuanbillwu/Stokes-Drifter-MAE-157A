@@ -25,8 +25,8 @@ dt = 0.01
 
 # boundary points and conditions
 x0, y0, z0 = 1, -1, 1
-x1, y1, z1 = -1.5, 0, 2.5
-x2, y2, z2 = 1, 1, 1
+x1, y1, z1 = 1, -1, 1
+x2, y2, z2 = 1, -1, 1
 vy = 4.0
 T = 5
 

@@ -1,6 +1,6 @@
 
 import numpy as np
-from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega
+from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega, allocation_matrix
 #must always account for double covering with quaternions to prevent unwinding
 
 #get thrust and desired orientation
@@ -78,15 +78,8 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     # Control torque
     tau = -s * Kp * q_e[1:] - Kd * omega_e - Lambda * s * q_dot_e[1:]
 
-
-
     # Mixer matrix to solve for motor forces
-    mix = np.array([
-        [1, 1, 1, 1],        # Total thrust
-        [-l, l, l, -l],      # Roll
-        [l, l, -l, -l],      # Pitch
-        [d, -d, d, -d]       # Yaw
-    ])
+    mix = allocation_matrix(l,d)
 
     # Combine total thrust and torques
     tau_full = np.array([T, *tau])

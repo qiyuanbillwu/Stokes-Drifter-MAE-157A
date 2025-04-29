@@ -20,7 +20,7 @@ from trajectory import get_state
 ##########################################
 
 # Save data flag
-save_data = False
+save_data = True
 
 # Initial conditions
 t = 0.0
@@ -85,7 +85,6 @@ dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 data = np.append(t,state)
 data = np.append(data,f)
 
-
 # Simulation loop
 running = True
 while running:
@@ -116,6 +115,8 @@ while running:
     # Update data array (this can probably be done in a much cleaner way...)
     tmp = np.append(t,state)
     tmp = np.append(tmp,f)
+    #tmp = np.append(tmp,q_des)
+    #tmp = np.append(tmp,omega_des)
     data = np.vstack((data,tmp))
 
     # Update time
@@ -125,6 +126,10 @@ while running:
     print(t)
     if t >= tf:
         running = False
+
+# Summary of Output Lines
+# state = [ t,  posX,  posY, posZ, velX, velY, velZ, qw, qx, qy, qz, wx, wy, wz], f = [f1, f2, f3, f4]
+# index >>  0     1     2     3      4     5     6   7   8   9   10  11  12, 13        14  15  16  17
 
 # If save_data flag is true then save data
 if save_data:
