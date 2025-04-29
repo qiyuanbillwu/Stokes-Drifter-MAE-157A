@@ -41,6 +41,7 @@ def outer_loop_controller(state, trajectory, mass, g, re):
     first_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * (1 + e3_hat.T @ a_hat)
 
     q_des = np.array([first_part, cross_part[0], cross_part[1], cross_part[2]])
+    print("q_des: ", q_des)
 
     R_d = quat_to_rot(q_des)
 

@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from util import get_a_dot_hat
 
 # compute the matrix to solve polynomial coeffcient 
 def compute_A(t0, t1):
@@ -139,9 +140,10 @@ def get_state(t):
         q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
         # print("quarternion: ", q_d)
 
-        a_hat_dot = j / np.linalg.norm(a) - a * (np.transpose(a) @ j) / np.linalg.norm(a)**3
+        a_hat_dot = get_a_dot_hat(a, j)
         w = np.transpose(R_d) @ a_hat_dot
-        # print("a_hat_dot: ", a_hat_dot)
+        print("a_hat_dot: ", a_hat_dot)
+        print(get_a_dot_hat(a, j))
 
         a_hat_doubledot = s / np.linalg.norm(a) - (2 * j * (np.transpose(a) @ j) + a * (np.transpose(j) @ j + np.transpose(a) @ s)) / np.linalg.norm(a)**3 
         + 3 * a * (np.transpose(a) @ j)**2 / np.linalg.norm(a)**5
@@ -187,9 +189,68 @@ def get_simple_state(t):
         t = 0
     elif t > T:
         t = T
-
-    # Position linearly interpolated
+   # Position linearly interpolated
     r = r0 + v * t
+    
+     # Constant velocity, zero acceleration/jerk/snap
+    state = {
+        "r": r,
+        "v": v,
+        "a": np.zeros(3),
+        "j": np.zeros(3),
+        "s": np.zeros(3),
+        "q": np.array([1, 0, 0, 0]),  # No rotation
+        "w": np.zeros(3),
+        "wdot": np.zeros(3),
+    }
+    return state
+
+    A = compute_A(t0, t2)
+    b = np.vstack((r0, v0, a0, j0, r2, v2, a2, j2))
+    a_coeff = np.linalg.solve(A, b)
+
+    T_d_hat = np.array([0, 0, 1])
+    I = np.identity(3)
+
+    # calculate the kinematics at current time
+    r = np.array([t**0, t**1, t**2, t**3, t**4, t**5, t**6, t**7]) @ a_coeff
+    v = np.array([0, 1, 2*t, 3*t**2, 4*t**3, 5*t**4, 6*t**5, 7*t**6]) @ a_coeff
+    a = np.array([0, 0, 2, 6*t, 12*t**2, 20*t**3, 30*t**4, 42*t**5]) @ a_coeff
+    j = np.array([0, 0, 0, 6, 24*t, 60*t**2, 120*t**3, 210*t**4]) @ a_coeff 
+    s = np.array([0, 0, 0, 0, 24, 120*t, 360*t**2, 840*t**3]) @ a_coeff 
+
+    a_d = a + np.array([0 ,0, g])
+    # print("a_d: ", a_d)
+    #print("norm(a_d): ", np.linalg.norm(a_d))
+    a_d_hat = a_d / np.linalg.norm(a_d)
+    # print("a_d_hat: ", a_d_hat)
+    theta = np.arccos(np.dot(T_d_hat, a_d_hat))
+    # print("theta: ", theta)
+
+    if np.array_equal(a_d_hat, np.array([0,0,1])):  # accounts for when the denominator is 0 
+        n_hat = np.array([0, 0, 1])
+        w = np.array([0, 0, 0])
+        wdot = np.array([0, 0, 0])
+        q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
+    else: 
+        n = np.cross(T_d_hat, a_d_hat)
+        # print('n: ', n)
+        n_hat = n / np.linalg.norm(n)
+
+        # print("n_hat: ", n_hat)
+        n_cross = cross_product_matrix(n_hat)
+        R_d = I + np.sin(theta) * n_cross + (1-np.cos(theta)) * n_cross @ n_cross 
+        q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
+        # print("quarternion: ", q_d)
+
+        a_hat_dot = get_a_dot_hat(a, j)
+        w = np.transpose(R_d) @ a_hat_dot
+        # print("a_hat_dot: ", a_hat_dot)
+        # print(get_a_dot_hat(a, j))
+
+        a_hat_doubledot = s / np.linalg.norm(a) - (2 * j * (np.transpose(a) @ j) + a * (np.transpose(j) @ j + np.transpose(a) @ s)) / np.linalg.norm(a)**3 
+        + 3 * a * (np.transpose(a) @ j)**2 / np.linalg.norm(a)**5
+        wdot = np.transpose(R_d) @ a_hat_doubledot - cross_product_matrix(w) @ np.transpose(R_d) @ a_hat_dot
 
     # Constant velocity, zero acceleration/jerk/snap
     state = {

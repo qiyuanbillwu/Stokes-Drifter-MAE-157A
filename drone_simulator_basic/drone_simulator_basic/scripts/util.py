@@ -1,5 +1,11 @@
 import numpy as np
 
+# function to calculate the rate of change of a unit vector a_hat
+def get_a_dot_hat(a, adot):
+    if np.linalg.norm(a) == 0:
+        print("Error: a is 0!")
+    return adot / np.linalg.norm(a) - a * (a.T @ adot) / np.linalg.norm(a)**3
+
 # Helper function that converts a quaternion to rotation matrix
 	# https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion
 
