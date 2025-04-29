@@ -14,19 +14,21 @@ class dynamics:
 		self.l = params[2];
 		self.Cd = params[3]; # Propeller Drag Coefficient
 		self.Cl = params[4]; # Propeller Lift Coefficient
-		self.J = params[5]; 
+		self.J = np.diag([params[5],params[6],params[7]]); 
 	
 		self.d = self.Cd / self.Cl; # Ratio of lift to torque
 
 	# This is meant to give the rates of each state
 	def rates(self, state, f):
 		# Get rotation matrix from current quaterion
-		R = quat_to_rot([state[6], state[7], state[8], state[9]])
-		w = [state[10], state[11], state[12]];
+		q = [state[6], state[7], state[8], state[9]];
+		R = self.quat_to_rot(q);
+		w = np.array([state[10], state[11], state[12]]);
 
 		# Get thrust from motor forces f
 		A = allocation_matrix(self.l,self.d);
 		[T,tauX,tauY,tauZ] = np.matmul(A,f);
+		#print(T,tauX,tauY,tauZ);
 		
 		# Velocities
 		dx = state[3]
@@ -37,10 +39,15 @@ class dynamics:
 		dvx = R[0,2] * T  / self.m
 		dvy = R[1,2] * T  / self.m
 		dvz = R[2,2] * T  / self.m - self.g
+		#print("Rotation Matrix = ", R)
+		#print("Thrust = ", T)
+		#print("Mass = ", self.m)
 
 		# Orientation
-		Rdot = np.matmul(R, cross_matrix(w));
-		dq = rot_to_quat(Rdot);
+		#Rdot = np.matmul(R, self.cross_matrix(w));
+		#dq = self.rot_to_quat(Rdot);
+		dq = 0.5 * self.quatmul(q, [0, w[0], w[1], w[2]])
+		
 		dqw = dq[0];
 		dqx = dq[1];
 		dqy = dq[2];
@@ -83,5 +90,4 @@ class dynamics:
 
 		state += (dt / 6.0) * (k1 + 2*k2 + 2*k3 + k4)
 		return state
-
 
