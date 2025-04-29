@@ -170,52 +170,40 @@ def get_state(t):
         "j": j,         # jerk
         "s": s          # snap
     }
-    print(state)
+    #print(state)
 
     return state
 
-# get_state(-1)
+get_state(-1)
 
-def get_state_simple(t):
-    # boundary points and conditions
-    x0, y0, z0 = 0, 0, 0.5
-    x2, y2, z2 = 0, 0, 3 
 
-    t0, t2 = 0, 5
+# Define start and end points
+r0 = np.array([1, -1, 1])
+r1 = np.array([5.0, 5.0, 5.0])
+T = 5.0  # total time for trajectory
 
-    r0 = np.array([x0, y0, z0])
-    v0 = np.array([0, 0, 0])
-    a0 = np.array([0, 0, 0])
-    j0 = np.array([0, 0, 0])
-    r2 = np.array([x2, y2, z2])
-    v2, a2, j2 = v0, a0, j0
+v = (r1 - r0) / T  # constant velocity
 
-    if t < t0 or t > t2:
-        if t < t0:
-            r = r0
-        else:
-            r = r2
-        v = v0
-        a = v0
-        j = v0
-        s = v0
-        q_d = np.array([1, 0, 0, 0])
-        w = v0
-        wdot = v0
-        
-        state = {
-        "r": r,         # position
-        "v": v,         # velocity
-        "q": q_d,       # quarternion
-        "w": w,         # angular velocity
-        "wdot": wdot,   # angular acceleration
-        "a": a,         # acceleration
-        "j": j,         # jerk
-        "s": s          # snap
-        }
-        print(state)
-
-        return state
+def get_simple_state(t):
+    if t < 0:
+        t = 0
+    elif t > T:
+        t = T
+   # Position linearly interpolated
+    r = r0 + v * t
+    
+     # Constant velocity, zero acceleration/jerk/snap
+    state = {
+        "r": r,
+        "v": v,
+        "a": np.zeros(3),
+        "j": np.zeros(3),
+        "s": np.zeros(3),
+        "q": np.array([1, 0, 0, 0]),  # No rotation
+        "w": np.zeros(3),
+        "wdot": np.zeros(3),
+    }
+    return state
 
     A = compute_A(t0, t2)
     b = np.vstack((r0, v0, a0, j0, r2, v2, a2, j2))
@@ -264,17 +252,16 @@ def get_state_simple(t):
         + 3 * a * (np.transpose(a) @ j)**2 / np.linalg.norm(a)**5
         wdot = np.transpose(R_d) @ a_hat_doubledot - cross_product_matrix(w) @ np.transpose(R_d) @ a_hat_dot
 
+    # Constant velocity, zero acceleration/jerk/snap
     state = {
-        "r": r,         # position
-        "v": v,         # velocity
-        "q": q_d,       # quarternion
-        "w": w,         # angular velocity
-        "wdot": wdot,   # angular acceleration
-        "a": a,         # acceleration
-        "j": j,         # jerk
-        "s": s          # snap
+        "r": r,
+        "v": v,
+        "a": np.zeros(3),
+        "j": np.zeros(3),
+        "s": np.zeros(3),
+        "q": np.array([1, 0, 0, 0]),  # No rotation
+        "w": np.zeros(3),
+        "wdot": np.zeros(3),
     }
-    print(state)
-    return state
 
-get_state(1)
+    return state
