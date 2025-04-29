@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+#need to add hovering for before and after trajectory
+
 # compute the matrix to solve polynomial coeffcient 
 def compute_A(t0, t1):
     A = np.zeros((8, 8))
