@@ -19,8 +19,8 @@ def outer_loop_controller(state, trajectory, mass, g):
     e_vel = np.array([vxdes, vydes, vzdes]) - vel
 
     # PID gains for position control
-    Kp = np.array([1.5, 1.5, 10.0])  # Adjust these gains as necessary
-    Kd = np.array([1.0, 1.0, 5.0])  # Adjust these gains as necessary
+    Kp = np.array([1.5, 1.5, 1.5])  # Adjust these gains as necessary
+    Kd = np.array([1.0, 1.0, 1.0])  # Adjust these gains as necessary
 
     accel_des = np.array([axdes, aydes, azdes])
 

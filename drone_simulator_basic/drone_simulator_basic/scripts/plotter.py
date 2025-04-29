@@ -4,11 +4,10 @@ import matplotlib.pyplot as plt
 from trajectory import get_state
 
 # Update with actual file name in the data director
-file_name = "data_2025-04-28_14-29-03.csv"
+file_name = "data_2025-04-29_10-40-07.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../data/"+file_name, delimiter=',')
-print(data)
 
 
 t = data[:, 0]
@@ -45,6 +44,9 @@ plt.figure(1)
 plt.plot(t, x, label='x')
 plt.plot(t, y, label='y')
 plt.plot(t, z, label='z')
+plt.plot(t, xd, label='xd')
+plt.plot(t, yd, label='yd')
+plt.plot(t, zd, label='zd')
 plt.xlabel('Time [s]')
 plt.ylabel('Position [m]')
 plt.title('Position vs Time')
@@ -69,6 +71,9 @@ plt.figure(3)
 plt.plot(t, vx, label='vx')
 plt.plot(t, vy, label='vy')
 plt.plot(t, vz, label='vz')
+plt.plot(t, vxdes, label='vxdes')
+plt.plot(t, vydes, label='vydes')
+plt.plot(t, vzdes, label='vzdes')
 plt.xlabel('Time [s]')
 plt.ylabel('Velocity [m/s]')
 plt.title('Velocity vs Time')

@@ -13,14 +13,14 @@ print("Current Working Directory:", os.getcwd())
 ### Import custom modules and classes ###
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
-from trajectory import get_state
+from trajectory import get_state, get_simple_state
 
 ##########################################
 ############ Drone Simulation ############
 ##########################################
 
 # Save data flag
-save_data = False
+save_data = True
 
 # Initial conditions
 t = 0.0
@@ -30,11 +30,8 @@ f = np.zeros(4)
 
 # x, y, z
 # Zero Position
-
-#assuming start from 0,0,1
-
-state[0] = 0
-state[1] = 0
+state[0] = 1
+state[1] = -1
 state[2] = 1
 
 # vx, vy, vz
@@ -92,7 +89,7 @@ while running:
     # Get new desired state from trajectory planner
     # xd, yd, zd, ... = get_desired_state(t)
 
-    trajectory = get_state(t)
+    trajectory = get_simple_state(t)
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
@@ -111,6 +108,7 @@ while running:
     # If z to low then indicate crash and end simulation
     if state[2] < 0.1:
         print("CRASH!!!")
+        #print(state)
         break
 
     # Update data array (this can probably be done in a much cleaner way...)
