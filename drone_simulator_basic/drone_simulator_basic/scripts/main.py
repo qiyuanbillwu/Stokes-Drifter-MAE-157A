@@ -20,7 +20,7 @@ from trajectory import get_state
 ##########################################
 
 # Save data flag
-save_data = True
+save_data = False
 
 # Initial conditions
 t = 0.0
@@ -74,6 +74,8 @@ g = 9.81
 #placeholder for now
 m = 0.5     # mass of drone [kg]
 l = 0.115  # meters [m]
+m = 0.7437  # mass of drone [kg]
+l = 0.115   # meters [m]
 Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
 Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
 J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
