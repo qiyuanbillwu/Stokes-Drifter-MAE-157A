@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-#need to add hovering for before and after trajectory
-
 # compute the matrix to solve polynomial coeffcient 
 def compute_A(t0, t1):
     A = np.zeros((8, 8))
@@ -76,7 +74,31 @@ def cross_product_matrix(a):
 # outputs position, velocity, accelration, jerk, snap, quarternion, angular velocity, angular acceleration
 def get_state(t):
     if t < t0 or t > t2:
-        print("time must be within range")
+        if t < t0:
+            r = r0
+        else:
+            r = r2
+        v = v0
+        a = v0
+        j = v0
+        s = v0
+        q_d = np.array([1, 0, 0, 0])
+        w = v0
+        wdot = v0
+        
+        state = {
+        "r": r,         # position
+        "v": v,         # velocity
+        "q": q_d,       # quarternion
+        "w": w,         # angular velocity
+        "wdot": wdot,   # angular acceleration
+        "a": a,         # acceleration
+        "j": j,         # jerk
+        "s": s          # snap
+        }
+        print(state)
+
+        return state
     if t < t1:
         a_coeff = a1
     else:
@@ -146,8 +168,8 @@ def get_state(t):
         "j": j,         # jerk
         "s": s          # snap
     }
-    # print(state)
+    print(state)
 
     return state
 
-get_state(1.5)
+get_state(-1)
