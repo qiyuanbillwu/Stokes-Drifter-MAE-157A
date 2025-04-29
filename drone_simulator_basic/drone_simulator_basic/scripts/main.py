@@ -6,29 +6,36 @@
 ### Import python packages ###
 import numpy as np
 import datetime
+import os
+
+print("Current Working Directory:", os.getcwd())
 
 ### Import custom modules and classes ###
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
+from trajectory import get_state
 
 ##########################################
 ############ Drone Simulation ############
 ##########################################
 
 # Save data flag
-save_data = False
+save_data = True
 
 # Initial conditions
-t = 0.
+t = 0.0
 
 state = np.zeros(13)
 f = np.zeros(4)
 
 # x, y, z
 # Zero Position
-state[0] = x0
-state[1] = y0
-state[2] = z0
+
+#assuming start from 0,0,1
+
+state[0] = 0
+state[1] = 0
+state[2] = 1
 
 # vx, vy, vz
 # Zero Velocity
@@ -54,7 +61,7 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 10.
+tf = 3.0
 
 # Simulation rate
 rate = 500
@@ -65,6 +72,8 @@ g = 9.81
 
 # Other parameters?
 #placeholder for now
+m = 0.5     # mass of drone [kg]
+l = 0.115  # meters [m]
 m = 0.7437  # mass of drone [kg]
 l = 0.115   # meters [m]
 Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
@@ -72,7 +81,7 @@ Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
 J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
 
 # Initialize dynamics
-dyn = dynamics.dynamics(np.array([g,m,l,Cd,Cl,J]), dt)
+dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 
 # Initialize data array that contains useful info (probably should add more)
 data = np.append(t,state)
@@ -84,26 +93,21 @@ running = True
 while running:
     # Get new desired state from trajectory planner
     # xd, yd, zd, ... = get_desired_state(t)
-    #example
 
-    xd, yd, zd = 0.0, 0.0, 1.0  # meters
-    xdot, ydot, zdot = 0.0, 0.0, 0.0 
-
-    trajectory = {
-    'position': [xd, yd, zd],  # Desired position at current time step
-    'velocity': [xdot, ydot, zdot],  # Desired velocity at current time step
-    }
+    trajectory = get_state(t)
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
-    T, phi_des, theta_des, psi_des = outer_loop_controller(state, trajectory, mass=m, g=g)
+    T, q_des, omega_des = outer_loop_controller(state, trajectory, mass=m, g=g)
 
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller
     
-    f = inner_loop_controller(state, T, phi_des, theta_des, psi_des, l=l, c=c, J=J, quat_to_rot_func=dyn.quat_to_rot)
+    f = inner_loop_controller(state, q_des, omega_des, T, l, dyn.d)
 
     # Propagate dynamics with control inputs
+    #print(state.shape)
+    #print(f.shape)
     state = dyn.propagate(state, f, dt)
  
     # If z to low then indicate crash and end simulation
@@ -120,6 +124,7 @@ while running:
     t += dt 
 
     # If time exceeds final time then stop simulator
+    print(t)
     if t >= tf:
         running = False
 
@@ -128,4 +133,8 @@ if save_data:
     now = datetime.datetime.now()
     date_time_string = now.strftime("%Y-%m-%d_%H-%M-%S")
     file_name = f"data_{date_time_string}.csv"
+
+    file_path = os.path.abspath("../data/" + file_name)
+    print("Saving to:", file_path)
+
     np.savetxt("../data/"+file_name, data, delimiter=",")
