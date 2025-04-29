@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from util import get_a_dot_hat
 
 # compute the matrix to solve polynomial coeffcient 
 def compute_A(t0, t1):
@@ -139,9 +140,10 @@ def get_state(t):
         q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
         # print("quarternion: ", q_d)
 
-        a_hat_dot = j / np.linalg.norm(a) - a * (np.transpose(a) @ j) / np.linalg.norm(a)**3
+        a_hat_dot = get_a_dot_hat(a, j)
         w = np.transpose(R_d) @ a_hat_dot
-        # print("a_hat_dot: ", a_hat_dot)
+        print("a_hat_dot: ", a_hat_dot)
+        print(get_a_dot_hat(a, j))
 
         a_hat_doubledot = s / np.linalg.norm(a) - (2 * j * (np.transpose(a) @ j) + a * (np.transpose(j) @ j + np.transpose(a) @ s)) / np.linalg.norm(a)**3 
         + 3 * a * (np.transpose(a) @ j)**2 / np.linalg.norm(a)**5
@@ -253,9 +255,10 @@ def get_state_simple(t):
         q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
         # print("quarternion: ", q_d)
 
-        a_hat_dot = j / np.linalg.norm(a) - a * (np.transpose(a) @ j) / np.linalg.norm(a)**3
+        a_hat_dot = get_a_dot_hat(a, j)
         w = np.transpose(R_d) @ a_hat_dot
         # print("a_hat_dot: ", a_hat_dot)
+        # print(get_a_dot_hat(a, j))
 
         a_hat_doubledot = s / np.linalg.norm(a) - (2 * j * (np.transpose(a) @ j) + a * (np.transpose(j) @ j + np.transpose(a) @ s)) / np.linalg.norm(a)**3 
         + 3 * a * (np.transpose(a) @ j)**2 / np.linalg.norm(a)**5
@@ -274,4 +277,4 @@ def get_state_simple(t):
     print(state)
     return state
 
-get_state_simple(6)
+get_state(1)
