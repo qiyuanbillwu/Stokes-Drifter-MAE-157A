@@ -4,7 +4,7 @@
 # Description: Dynamics for drone simulator
 
 import numpy as np
-from util import quat_to_rot, rot_to_quat, cross_matrix, allocation_matrix
+from util import quat_to_rot, rot_to_quat, cross_matrix, allocation_matrix, quat_multiply
 
 class dynamics: 
 	def __init__(self, params, dt):
@@ -14,7 +14,7 @@ class dynamics:
 		self.l = params[2];
 		self.Cd = params[3]; # Propeller Drag Coefficient
 		self.Cl = params[4]; # Propeller Lift Coefficient
-		self.J = np.diag([params[5],params[6],params[7]]); 
+		self.J = params[5]; 
 	
 		self.d = self.Cd / self.Cl; # Ratio of lift to torque
 
@@ -22,7 +22,7 @@ class dynamics:
 	def rates(self, state, f):
 		# Get rotation matrix from current quaterion
 		q = [state[6], state[7], state[8], state[9]];
-		R = self.quat_to_rot(q);
+		R = quat_to_rot(q);
 		w = np.array([state[10], state[11], state[12]]);
 
 		# Get thrust from motor forces f
@@ -46,7 +46,7 @@ class dynamics:
 		# Orientation
 		#Rdot = np.matmul(R, self.cross_matrix(w));
 		#dq = self.rot_to_quat(Rdot);
-		dq = 0.5 * self.quatmul(q, [0, w[0], w[1], w[2]])
+		dq = 0.5 * quat_multiply(q, [0, w[0], w[1], w[2]])
 		
 		dqw = dq[0];
 		dqx = dq[1];
