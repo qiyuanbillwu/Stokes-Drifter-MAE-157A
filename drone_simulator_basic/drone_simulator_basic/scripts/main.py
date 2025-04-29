@@ -72,8 +72,6 @@ g = 9.81
 
 # Other parameters?
 #placeholder for now
-m = 0.5     # mass of drone [kg]
-l = 0.115  # meters [m]
 m = 0.7437  # mass of drone [kg]
 l = 0.115   # meters [m]
 Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
