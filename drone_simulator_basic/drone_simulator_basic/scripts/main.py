@@ -97,7 +97,7 @@ while running:
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
-    T, q_des, omega_des = outer_loop_controller(state, trajectory, mass=m, g=g)
+    T, q_des, omega_des = outer_loop_controller(state, trajectory, mass=m, g=g, dt=dt)
 
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller

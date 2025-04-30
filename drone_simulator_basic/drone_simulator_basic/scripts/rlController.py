@@ -1,10 +1,10 @@
 
 import numpy as np
-from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega
+from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega, get_a_dot_hat
 #must always account for double covering with quaternions to prevent unwinding
 
 #get thrust and desired orientation
-def outer_loop_controller(state, trajectory, mass, g, re):
+def outer_loop_controller(state, trajectory, mass, g, dt):
     # Extract current state
     pos = state[0:3]
     vel = state[3:6]
@@ -47,8 +47,9 @@ def outer_loop_controller(state, trajectory, mass, g, re):
 
     #placeholder
     a_dot = trajectory['j'] - Kp * e_vel - Kd * e_vel / dt 
-    j = trajectory['j']
-    adot_hat = j / np.linalg.norm(a) - a * (np.transpose(a) @ j) / np.linalg.norm(a)**3
+
+    adot_hat = get_a_dot_hat(a, a_dot)
+
 
     omega_des = R_d.T @ adot_hat
 
