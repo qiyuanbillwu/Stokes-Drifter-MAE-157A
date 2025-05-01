@@ -1,10 +1,12 @@
 
 import numpy as np
-from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega
+from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega, get_a_dot_hat
 #must always account for double covering with quaternions to prevent unwinding
 
+#rlController works for just vertical position change
+
 #get thrust and desired orientation
-def outer_loop_controller(state, trajectory, mass, g):
+def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
     # Extract current state
     pos = state[0:3]
     vel = state[3:6]
@@ -18,9 +20,11 @@ def outer_loop_controller(state, trajectory, mass, g):
     e_pos = np.array([xd, yd, zd]) - pos
     e_vel = np.array([vxdes, vydes, vzdes]) - vel
 
+
+
     # PID gains for position control
-    Kp = np.array([1.5, 1.5, 10.0])  # Adjust these gains as necessary
-    Kd = np.array([1.0, 1.0, 5.0])  # Adjust these gains as necessary
+    Kp = np.array([0.3, 0.3, 0.3])  # Adjust these gains as necessary
+    Kd = np.array([0.1, 0.1, 0.1])  # Adjust these gains as necessary
 
     accel_des = np.array([axdes, aydes, azdes])
 
@@ -44,11 +48,16 @@ def outer_loop_controller(state, trajectory, mass, g):
     R_d = quat_to_rot(q_des)
 
     #placeholder
-    adot_hat = trajectory['j']
+    a_dot = trajectory['j'] - Kp * e_vel - Kd * (e_vel - lastVelError) / dt
+
+    lastVelError = e_vel
+
+    adot_hat = get_a_dot_hat(a, a_dot)
+
 
     omega_des = R_d.T @ adot_hat
 
-    return T, q_des, omega_des
+    return T, q_des, omega_des, lastVelError
 
 def inner_loop_controller(state, q_des, omega_des, T, l, d):
     # Extract current quaternion and angular velocity
@@ -59,8 +68,8 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     q_e = quaternion_error(q_des, q_curr)
 
     # PD gains
-    Kp = np.array([8.0, 8.0, 3.0])
-    Kd = np.array([1.5, 1.5, 0.8])   
+    Kp = np.array([1.0, 1.0, 1.0])
+    Kd = np.array([0.3, 0.3, 0.3])   
 
     Lambda = np.array([0.5, 0.5, 0.3])
 

@@ -1,14 +1,13 @@
 ### Import python packages ###
 import numpy as np
 import matplotlib.pyplot as plt
-from trajectory import get_state
+from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-file_name = "data_2025-04-28_14-29-03.csv"
+file_name = "data_2025-05-01_10-49-26.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../data/"+file_name, delimiter=',')
-print(data)
 
 
 t = data[:, 0]
@@ -45,6 +44,9 @@ plt.figure(1)
 plt.plot(t, x, label='x')
 plt.plot(t, y, label='y')
 plt.plot(t, z, label='z')
+plt.plot(t, xd, label='xd')
+plt.plot(t, yd, label='yd')
+plt.plot(t, zd, label='zd')
 plt.xlabel('Time [s]')
 plt.ylabel('Position [m]')
 plt.title('Position vs Time')
@@ -69,10 +71,16 @@ plt.figure(3)
 plt.plot(t, vx, label='vx')
 plt.plot(t, vy, label='vy')
 plt.plot(t, vz, label='vz')
+plt.plot(t, vxdes, label='vxdes')
+plt.plot(t, vydes, label='vydes')
+plt.plot(t, vzdes, label='vzdes')
 plt.xlabel('Time [s]')
 plt.ylabel('Velocity [m/s]')
 plt.title('Velocity vs Time')
 plt.legend()
 plt.grid()
+
+print("Final Actual Position:   x = {:.3f}, y = {:.3f}, z = {:.3f}".format(x[-1], y[-1], z[-1]))
+print("Final Desired Position:  xd = {:.3f}, yd = {:.3f}, zd = {:.3f}".format(xd[-1], yd[-1], zd[-1]))
 
 plt.show()

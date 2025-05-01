@@ -14,14 +14,14 @@ print("Current Working Directory:", os.getcwd())
 ### Import custom modules and classes ###
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
-from trajectory import get_state
+from trajectory import get_state, get_state_simple
 
 ##########################################
 ############ Drone Simulation ############
 ##########################################
 
 # Save data flag
-save_data = False
+save_data = True
 
 # Initial conditions
 t = 0.0
@@ -36,7 +36,7 @@ f = np.zeros(4)
 
 state[0] = 0
 state[1] = 0
-state[2] = 1
+state[2] = 0.5    
 
 # vx, vy, vz
 # Zero Velocity
@@ -86,7 +86,7 @@ dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 data = np.append(t,state)
 data = np.append(data,f)
 
-
+lastVelError = 0
 # Simulation loop
 running = True
 while running:
@@ -97,7 +97,7 @@ while running:
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
-    T, q_des, omega_des = outer_loop_controller(state, trajectory, mass=m, g=g)
+    T, q_des, omega_des, lastVelError = outer_loop_controller(state, trajectory, m, g, dt, lastVelError)
 
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller
