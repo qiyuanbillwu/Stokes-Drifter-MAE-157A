@@ -1,10 +1,10 @@
 ### Import python packages ###
 import numpy as np
 import matplotlib.pyplot as plt
-from trajectory import get_state, get_simple_state
+from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-file_name = "data_2025-05-01_10-32-15.csv"
+file_name = "data_2025-05-01_10-49-26.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../data/"+file_name, delimiter=',')
@@ -23,7 +23,7 @@ xd, yd, zd = [], [], []
 vxdes, vydes, vzdes = [], [], []
 
 for ti in t:
-    traj = get_simple_state(ti)
+    traj = get_state(ti)
     xd.append(traj['r'][0])
     yd.append(traj['r'][1])
     zd.append(traj['r'][2])
@@ -79,5 +79,8 @@ plt.ylabel('Velocity [m/s]')
 plt.title('Velocity vs Time')
 plt.legend()
 plt.grid()
+
+print("Final Actual Position:   x = {:.3f}, y = {:.3f}, z = {:.3f}".format(x[-1], y[-1], z[-1]))
+print("Final Desired Position:  xd = {:.3f}, yd = {:.3f}, zd = {:.3f}".format(xd[-1], yd[-1], zd[-1]))
 
 plt.show()
