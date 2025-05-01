@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-file_name = "data_2025-05-01_11-26-02.csv"
+file_name = "data_2025-05-01_16-29-18.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../data/"+file_name, delimiter=',')
@@ -52,19 +52,23 @@ plt.ylabel('Position [m]')
 plt.title('Position vs Time')
 plt.legend()
 plt.grid()
+plt.ylim(-2,4)
 
 # --- 3D Drone Trajectory ---
 
 fig = plt.figure(2)
 ax = fig.add_subplot(111, projection='3d')
 ax.plot(x, y, z, label='Drone trajectory')
-ax.plot(xd, yd, zd, label = 'Desired trajectory')
+ax.plot(xd, yd, zd, label = 'Desired trajectory', linestyle='--')
 ax.set_xlabel('X [m]')
 ax.set_ylabel('Y [m]')
 ax.set_zlabel('Z [m]')
 ax.set_title('3D Drone Trajectory')
 ax.legend()
 ax.grid()
+ax.set_xlim(-2,2)
+ax.set_ylim(-2,2)
+ax.set_zlim(0,4)
 
 # --- Velocity vs Time ---
 plt.figure(3)
@@ -79,6 +83,7 @@ plt.ylabel('Velocity [m/s]')
 plt.title('Velocity vs Time')
 plt.legend()
 plt.grid()
+
 
 print("Final Actual Position:   x = {:.3f}, y = {:.3f}, z = {:.3f}".format(x[-1], y[-1], z[-1]))
 print("Final Desired Position:  xd = {:.3f}, yd = {:.3f}, zd = {:.3f}".format(xd[-1], yd[-1], zd[-1]))
