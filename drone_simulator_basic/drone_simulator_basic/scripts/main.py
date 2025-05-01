@@ -14,7 +14,7 @@ print("Current Working Directory:", os.getcwd())
 ### Import custom modules and classes ###
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
-from trajectory import get_state
+from trajectory import get_state, get_simple_state
 
 ##########################################
 ############ Drone Simulation ############
@@ -93,7 +93,7 @@ while running:
     # Get new desired state from trajectory planner
     # xd, yd, zd, ... = get_desired_state(t)
 
-    trajectory = get_state(0)
+    trajectory = get_simple_state(t)
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
