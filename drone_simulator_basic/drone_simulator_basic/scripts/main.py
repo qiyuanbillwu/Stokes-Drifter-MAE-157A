@@ -32,11 +32,11 @@ f = np.zeros(4)
 # x, y, z
 # Zero Position
 
-#assuming start from 0,0,1
+#assuming start from 1,1,1
 
-state[0] = 0
-state[1] = 0
-state[2] = 0.5    
+state[0] = 1
+state[1] = 1
+state[2] = 1   
 
 # vx, vy, vz
 # Zero Velocity
@@ -93,7 +93,7 @@ while running:
     # Get new desired state from trajectory planner
     # xd, yd, zd, ... = get_desired_state(t)
 
-    trajectory = get_state(t)
+    trajectory = get_state_simple(t)
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller

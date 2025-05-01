@@ -72,6 +72,7 @@ def cross_product_matrix(a):
     return m
 
 # gets the current state at time t, using the trajectory kinematics
+# gets states bewteen 2 points and an intermediate point in bewteen 
 # outputs position, velocity, accelration, jerk, snap, quarternion, angular velocity, angular acceleration
 def get_state(t):
     if t < t0 or t > t2:
@@ -97,7 +98,7 @@ def get_state(t):
         "j": j,         # jerk
         "s": s          # snap
         }
-        print(state)
+        # print(state)
 
         return state
     if t < t1:
@@ -170,16 +171,23 @@ def get_state(t):
         "j": j,         # jerk
         "s": s          # snap
     }
-    print(state)
+    # print(state)
 
     return state
 
 # get_state(-1)
 
+# get states between 2 points 
 def get_state_simple(t):
     # boundary points and conditions
-    x0, y0, z0 = 0, 0, 0.5
-    x2, y2, z2 = 0, 0, 3 
+
+    # hovering up the z axis
+    # x0, y0, z0 = 0, 0, 0.5
+    # x2, y2, z2 = 0, 0, 3 
+
+    # moving along x, y, and z in a straight line
+    x0, y0, z0 = 1, 1, 1
+    x2, y2, z2 = 3, 3, 3 
 
     t0, t2 = 0, 5
 
@@ -213,7 +221,7 @@ def get_state_simple(t):
         "j": j,         # jerk
         "s": s          # snap
         }
-        print(state)
+        # print(state)
 
         return state
 
@@ -274,7 +282,8 @@ def get_state_simple(t):
         "j": j,         # jerk
         "s": s          # snap
     }
-    print(state)
+    # print(state)
     return state
 
-get_state(1)
+# get_state(0)
+# get_state_simple(6)

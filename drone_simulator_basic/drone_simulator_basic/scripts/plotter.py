@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-file_name = "data_2025-05-01_10-49-26.csv"
+file_name = "data_2025-05-01_11-26-02.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../data/"+file_name, delimiter=',')
@@ -23,7 +23,7 @@ xd, yd, zd = [], [], []
 vxdes, vydes, vzdes = [], [], []
 
 for ti in t:
-    traj = get_state(ti)
+    traj = get_state_simple(ti)
     xd.append(traj['r'][0])
     yd.append(traj['r'][1])
     zd.append(traj['r'][2])
