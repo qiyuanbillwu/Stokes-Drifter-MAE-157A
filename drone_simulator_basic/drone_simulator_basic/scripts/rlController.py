@@ -3,6 +3,8 @@ import numpy as np
 from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega, get_a_dot_hat
 #must always account for double covering with quaternions to prevent unwinding
 
+#rlController works for just vertical position change
+
 #get thrust and desired orientation
 def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
     # Extract current state
@@ -66,8 +68,8 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     q_e = quaternion_error(q_des, q_curr)
 
     # PD gains
-    Kp = np.array([8.0, 8.0, 3.0])
-    Kd = np.array([1.5, 1.5, 0.8])   
+    Kp = np.array([1.0, 1.0, 1.0])
+    Kd = np.array([0.3, 0.3, 0.3])   
 
     Lambda = np.array([0.5, 0.5, 0.3])
 
