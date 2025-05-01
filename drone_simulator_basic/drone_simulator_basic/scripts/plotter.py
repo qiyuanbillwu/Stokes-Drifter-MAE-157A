@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from trajectory import get_state
 
 # Update with actual file name in the data director
-file_name = "data_2025-04-29_11-06-08.csv"
+file_name = "data_2025-05-01_10-09-31.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../data/"+file_name, delimiter=',')
@@ -23,7 +23,7 @@ xd, yd, zd = [], [], []
 vxdes, vydes, vzdes = [], [], []
 
 for ti in t:
-    traj = get_state(ti)
+    traj = get_state(0)
     xd.append(traj['r'][0])
     yd.append(traj['r'][1])
     zd.append(traj['r'][2])
@@ -57,7 +57,7 @@ plt.grid()
 
 fig = plt.figure(2)
 ax = fig.add_subplot(111, projection='3d')
-ax.plot(x, y, z, label='Drone trajectory')
+#ax.plot(x, y, z, label='Drone trajectory')
 ax.plot(xd, yd, zd, label = 'Desired trajectory')
 ax.set_xlabel('X [m]')
 ax.set_ylabel('Y [m]')

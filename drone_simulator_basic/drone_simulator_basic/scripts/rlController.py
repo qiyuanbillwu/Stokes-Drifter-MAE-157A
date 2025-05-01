@@ -4,7 +4,7 @@ from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, q
 #must always account for double covering with quaternions to prevent unwinding
 
 #get thrust and desired orientation
-def outer_loop_controller(state, trajectory, mass, g, dt):
+def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
     # Extract current state
     pos = state[0:3]
     vel = state[3:6]
@@ -46,14 +46,16 @@ def outer_loop_controller(state, trajectory, mass, g, dt):
     R_d = quat_to_rot(q_des)
 
     #placeholder
-    a_dot = trajectory['j'] - Kp * e_vel - Kd * e_vel / dt 
+    a_dot = trajectory['j'] - Kp * e_vel - Kd * (e_vel - lastVelError) / dt
+
+    lastVelError = e_vel
 
     adot_hat = get_a_dot_hat(a, a_dot)
 
 
     omega_des = R_d.T @ adot_hat
 
-    return T, q_des, omega_des
+    return T, q_des, omega_des, lastVelError
 
 def inner_loop_controller(state, q_des, omega_des, T, l, d):
     # Extract current quaternion and angular velocity
