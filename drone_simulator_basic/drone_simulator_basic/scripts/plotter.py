@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-file_name = "data_2025-05-01_16-39-41.csv"
+file_name = "data/data_2025-05-01_17-25-12.csv"
 
 # Load in data as giant matrix
-data = np.loadtxt("../data/"+file_name, delimiter=',')
+data = np.loadtxt("../"+file_name, delimiter=',')
 
 
 t = data[:, 0]
