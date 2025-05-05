@@ -92,23 +92,47 @@ def cross_matrix(v):
         [-vy,  vx,   0 ]
     ])
 
+# def allocation_matrix(l,d):
+#     #  Front
+#     #    ^
+#     #    |
+#     # 1      2
+#     #    |
+#     # 4      3
+
+#     # 1 CCW
+#     # 2 CW
+#     # 3 CCW
+#     # 4 CW
+
+#     return np.array([
+#     [1, 1, 1, 1],        # Total thrust
+#     [-l, l, l, -l],      # Roll
+#     [l, l, -l, -l],      # Pitch
+#     [d, -d, d, -d]       # Yaw
+#     ])
+
+# ==============================================
+# changed by Bill, alternative allocation matrix
+# ==============================================
+
 def allocation_matrix(l,d):
     #  Front
     #    ^
     #    |
-    # 1      2
+    # 2      1
     #    |
-    # 4      3
+    # 3      4
 
-    # 1 CCW
-    # 2 CW
-    # 3 CCW
-    # 4 CW
+    # 1 CW
+    # 2 CCW
+    # 3 CW
+    # 4 CCW
 
     return np.array([
     [1, 1, 1, 1],        # Total thrust
-    [-l, l, l, -l],      # Roll
-    [l, l, -l, -l],      # Pitch
+    [0, -l, 0, l],      # Roll
+    [-l, 0, l, 0],      # Pitch
     [d, -d, d, -d]       # Yaw
     ])
 
