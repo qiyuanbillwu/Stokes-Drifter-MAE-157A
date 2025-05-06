@@ -46,7 +46,7 @@ class dynamics:
 		# Orientation
 		#Rdot = np.matmul(R, self.cross_matrix(w));
 		#dq = self.rot_to_quat(Rdot);
-		
+
 		dq = 0.5 * quat_multiply(q, [0, w[0], w[1], w[2]])
 		
 		dqw = dq[0];
@@ -91,4 +91,3 @@ class dynamics:
 
 		state += (dt / 6.0) * (k1 + 2*k2 + 2*k3 + k4)
 		return state
-

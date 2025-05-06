@@ -187,3 +187,40 @@ def euler_to_quaternion(roll, pitch, yaw):
     z = cr * cp * sy - sr * sp * cy
 
     return (w, x, y, z)
+
+import numpy as np
+
+def euler_rates_to_body_rates_XYZ(roll, pitch, yaw, roll_dot, pitch_dot, yaw_dot):
+    """
+    Convert XYZ Euler angle derivatives to body angular velocity (omega_x, omega_y, omega_z).
+
+    Args:
+        roll: float, roll angle (X), radians
+        pitch: float, pitch angle (Y), radians
+        yaw: float, yaw angle (Z), radians
+        roll_dot: float, roll rate (d/dt), radians/sec
+        pitch_dot: float, pitch rate (d/dt), radians/sec
+        yaw_dot: float, yaw rate (d/dt), radians/sec
+
+    Returns:
+        np.array of shape (3,), body angular velocity [omega_x, omega_y, omega_z]
+    """
+    sr = np.sin(roll)
+    cr = np.cos(roll)
+    sp = np.sin(pitch)
+    cp = np.cos(pitch)
+    sy = np.sin(yaw)
+    cy = np.cos(yaw)
+
+    # Euler XYZ rates to body rates matrix
+    J = np.array([
+        [1, 0, -sp],
+        [0, cr, sr * cp],
+        [0, -sr, cr * cp]
+    ])
+
+    euler_dot = np.array([roll_dot, pitch_dot, yaw_dot])
+
+    omega = J @ euler_dot
+
+    return omega
