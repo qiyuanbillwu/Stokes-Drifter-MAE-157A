@@ -107,9 +107,9 @@ def allocation_matrix(l,d):
 
     return np.array([
     [1, 1, 1, 1],        # Total thrust
-    [l, -l, -l, l],      # Roll
-    [l, l, -l, -l],      # Pitch
-    [d, -d, d, -d]       # Yaw
+    [l, l, -l, -l],      # Roll
+    [l, -l, -l, l],      # Pitch
+    [-d, d, -d, d]       # Yaw
     ])
 
 # ==============================================
