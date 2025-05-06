@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from util import get_a_dot_hat, cross_matrix
 
 # compute the matrix to solve polynomial coeffcient 
 def compute_A(t0, t1):
@@ -58,19 +59,8 @@ a2 = np.linalg.solve(A2, b2)
 
 #print(a1)
 
-# compute the cross product matrix from a vector
-def cross_product_matrix(a):
-    m = np.zeros((3,3))
-    m[0,1] = -a[2]
-    m[0,2] = a[1]
-    m[1,2] = -a[0]
-    m[1,0] = -m[0,1]
-    m[2,0] = -m[0,2]
-    m[2,1] = -m[1,2]
-
-    return m
-
 # gets the current state at time t, using the trajectory kinematics
+# gets states bewteen 2 points and an intermediate point in bewteen 
 # outputs position, velocity, accelration, jerk, snap, quarternion, angular velocity, angular acceleration
 def get_state(t):
     if t < t0 or t > t2:
@@ -96,7 +86,7 @@ def get_state(t):
         "j": j,         # jerk
         "s": s          # snap
         }
-        print(state)
+        # print(state)
 
         return state
     if t < t1:
@@ -134,18 +124,19 @@ def get_state(t):
         n_hat = n / np.linalg.norm(n)
 
         # print("n_hat: ", n_hat)
-        n_cross = cross_product_matrix(n_hat)
+        n_cross = cross_matrix(n_hat)
         R_d = I + np.sin(theta) * n_cross + (1-np.cos(theta)) * n_cross @ n_cross 
         q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
         # print("quarternion: ", q_d)
 
-        a_hat_dot = j / np.linalg.norm(a) - a * (np.transpose(a) @ j) / np.linalg.norm(a)**3
+        a_hat_dot = get_a_dot_hat(a, j)
         w = np.transpose(R_d) @ a_hat_dot
-        # print("a_hat_dot: ", a_hat_dot)
+        print("a_hat_dot: ", a_hat_dot)
+        print(get_a_dot_hat(a, j))
 
         a_hat_doubledot = s / np.linalg.norm(a) - (2 * j * (np.transpose(a) @ j) + a * (np.transpose(j) @ j + np.transpose(a) @ s)) / np.linalg.norm(a)**3 
         + 3 * a * (np.transpose(a) @ j)**2 / np.linalg.norm(a)**5
-        wdot = np.transpose(R_d) @ a_hat_doubledot - cross_product_matrix(w) @ np.transpose(R_d) @ a_hat_dot
+        wdot = np.transpose(R_d) @ a_hat_doubledot - cross_matrix(w) @ np.transpose(R_d) @ a_hat_dot
 
     # print("w: ", w)
     # print("wdot: ", wdot)
@@ -168,16 +159,31 @@ def get_state(t):
         "j": j,         # jerk
         "s": s          # snap
     }
-    print(state)
+    # print(state)
 
     return state
 
 # get_state(-1)
 
+# get states between 2 points 
 def get_state_simple(t):
     # boundary points and conditions
-    x0, y0, z0 = 0, 0, 0.5
-    x2, y2, z2 = 0, 0, 3 
+
+    # moving along the x axis
+    x0, y0, z0 = -1, 0, 1
+    x2, y2, z2 = 1, 0, 1 
+
+    # moving along the y axis
+    # x0, y0, z0 = 0, -1, 1
+    # x2, y2, z2 = 0, 1, 1 
+
+    # moving along the z axis
+    # x0, y0, z0 = 0, 0, 0.5
+    # x2, y2, z2 = 0, 0, 3 
+
+    # moving along x, y, and z in a straight line
+    # x0, y0, z0 = -1, -1, 1
+    # x2, y2, z2 = 1, 1, 3 
 
     t0, t2 = 0, 5
 
@@ -248,18 +254,19 @@ def get_state_simple(t):
         n_hat = n / np.linalg.norm(n)
 
         # print("n_hat: ", n_hat)
-        n_cross = cross_product_matrix(n_hat)
+        n_cross = cross_matrix(n_hat)
         R_d = I + np.sin(theta) * n_cross + (1-np.cos(theta)) * n_cross @ n_cross 
         q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
         # print("quarternion: ", q_d)
 
-        a_hat_dot = j / np.linalg.norm(a) - a * (np.transpose(a) @ j) / np.linalg.norm(a)**3
+        a_hat_dot = get_a_dot_hat(a, j)
         w = np.transpose(R_d) @ a_hat_dot
         # print("a_hat_dot: ", a_hat_dot)
+        # print(get_a_dot_hat(a, j))
 
         a_hat_doubledot = s / np.linalg.norm(a) - (2 * j * (np.transpose(a) @ j) + a * (np.transpose(j) @ j + np.transpose(a) @ s)) / np.linalg.norm(a)**3 
         + 3 * a * (np.transpose(a) @ j)**2 / np.linalg.norm(a)**5
-        wdot = np.transpose(R_d) @ a_hat_doubledot - cross_product_matrix(w) @ np.transpose(R_d) @ a_hat_dot
+        wdot = np.transpose(R_d) @ a_hat_doubledot - cross_matrix(w) @ np.transpose(R_d) @ a_hat_dot
 
     state = {
         "r": r,         # position
@@ -274,4 +281,5 @@ def get_state_simple(t):
     print(state)
     return state
 
-get_state_simple(6)
+# get_state(0)
+get_state_simple(3)

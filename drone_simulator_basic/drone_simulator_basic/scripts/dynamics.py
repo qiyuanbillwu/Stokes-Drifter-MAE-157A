@@ -16,7 +16,7 @@ class dynamics:
 		self.Cl = params[4]; # Propeller Lift Coefficient
 		self.J = params[5]; 
 	
-		self.d = self.Cd / self.Cl; # Ratio of lift to torque
+		self.d = self.Cd / self.Cl; # Ratio of drag coefficient to lift / thrust coefficient 
 
 	# This is meant to give the rates of each state
 	def rates(self, state, f):
