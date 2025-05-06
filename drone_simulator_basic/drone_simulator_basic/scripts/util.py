@@ -159,3 +159,31 @@ def qdot_from_omega(q, omega):
     """Compute q_dot from quaternion q and angular velocity omega"""
     omega_quat = np.array([0, *omega])
     return 0.5 * quat_multiply(q, omega_quat)
+
+import numpy as np
+
+def euler_to_quaternion(roll, pitch, yaw):
+    """
+    Convert Euler angles to quaternion.
+    
+    Args:
+        roll: Rotation around X-axis (in radians)
+        pitch: Rotation around Y-axis (in radians)
+        yaw: Rotation around Z-axis (in radians)
+    
+    Returns:
+        A tuple (w, x, y, z) representing the quaternion.
+    """
+    cy = np.cos(yaw * 0.5)
+    sy = np.sin(yaw * 0.5)
+    cp = np.cos(pitch * 0.5)
+    sp = np.sin(pitch * 0.5)
+    cr = np.cos(roll * 0.5)
+    sr = np.sin(roll * 0.5)
+
+    w = cr * cp * cy + sr * sp * sy
+    x = sr * cp * cy - cr * sp * sy
+    y = cr * sp * cy + sr * cp * sy
+    z = cr * cp * sy - sr * sp * cy
+
+    return (w, x, y, z)
