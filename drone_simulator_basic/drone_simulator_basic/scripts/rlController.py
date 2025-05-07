@@ -6,7 +6,7 @@ from util import quat_to_rot, quat_multiply, quat_conjugate, qdot_from_omega, ge
 #qy is not correct for some reason
 
 #get thrust and desired orientation
-def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
+def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_filtered_derivative):
     # Extract current state
     pos = state[0:3]
     vel = state[3:6]
@@ -49,7 +49,19 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
 
     # =============
     # how to apply a low-pass filter?
-    a_dot = trajectory['j'] - Kp * e_vel - Kd * (e_vel - lastVelError) / dt
+
+    raw_derivative = (e_vel - lastVelError) / dt
+
+    alpha = 0.2
+
+    # Apply low-pass filter to derivative only
+    filtered_derivative = alpha * prev_filtered_derivative + (1 - alpha) * raw_derivative
+
+    prev_filtered_derivative = filtered_derivative
+
+    a_dot = trajectory['j'] - Kp * e_vel - Kd * filtered_derivative
+
+    
 
     lastVelError = e_vel
 
@@ -62,7 +74,7 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
     omega_des[0] = -omega[1]
     omega_des[1] = omega[0]
 
-    return T, q_des, omega_des, lastVelError
+    return T, q_des, omega_des, lastVelError, prev_filtered_derivative
 
 #prob correct
 def inner_loop_controller(state, q_des, omega_des, T, l, d):

@@ -88,6 +88,7 @@ data = np.append(t,state)
 data = np.append(data,f)
 
 lastVelError = 0
+prev_filtered_derivative = 0
 
 q_actual_log = []
 q_desired_log = []
@@ -104,7 +105,7 @@ while running:
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
-    T, q_des, omega_des, lastVelError = outer_loop_controller(state, trajectory, m, g, dt, lastVelError)
+    T, q_des, omega_des, lastVelError, prev_filtered_derivative = outer_loop_controller(state, trajectory, m, g, dt, lastVelError, prev_filtered_derivative)
 
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller
