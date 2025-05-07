@@ -1,9 +1,9 @@
 
 import numpy as np
-from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega, get_a_dot_hat, allocation_matrix
+from util import quat_to_rot, quat_multiply, quat_conjugate, qdot_from_omega, get_a_dot_hat, allocation_matrix
 #must always account for double covering with quaternions to prevent unwinding
 
-#rlController works for just vertical position change
+#qy is not correct for some reason
 
 #get thrust and desired orientation
 def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
@@ -64,6 +64,7 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
 
     return T, q_des, omega_des, lastVelError
 
+#prob correct
 def inner_loop_controller(state, q_des, omega_des, T, l, d):
     # Extract current quaternion and angular velocity
     q_curr = state[6:10]       # [qw, qx, qy, qz]
@@ -71,15 +72,17 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
 
     # ============================
     # Orientation error quaternion: q_e = q_des^* ⊗ q_curr
-    # this should be q_des conjugate, but somehow q_des works better
-    # q_e = quaternion_error(quat_conjugate(q_des), q_curr)
-    q_e = quaternion_error(q_des, q_curr)
+    q_e = quat_multiply(quat_conjugate(q_des), q_curr)
 
     # PD gains
-    Kp = np.array([1.0, 1.0, 0.5])
-    Kd = np.array([0.3, 0.3, 0.3])   
+    Kp_vec = np.array([0.4, 0.4, 0.4])
+    Kd_vec = np.array([0.2, 0.2, 0.2])
 
-    Lambda = np.array([0.5, 0.5, 0.3])
+    Kp = np.diag(Kp_vec)
+    Kd = np.diag(Kd_vec) 
+
+    Lambda = np.array([0.2, 0.2, 0.2])
+
 
     # Sign correction to avoid unwinding
     s = np.sign(q_e[0]) if q_e[0] != 0 else 1
@@ -89,10 +92,10 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     
     # Angular velocity error
     omega_e = omega - R_e @ omega_des
-    q_dot_e = qdot_from_omega(q_des, omega_e)
+    q_dot_e = qdot_from_omega(q_e, omega_e)
 
     # Control torque
-    tau = -s * Kp * q_e[1:] - Kd * omega_e - Lambda * s * q_dot_e[1:]
+    tau = -s * Kp @ q_e[1:] - Kd @ omega_e - Lambda * s * q_dot_e[1:]
 
     # Mixer matrix to solve for motor forces
     mix = allocation_matrix(l,d)

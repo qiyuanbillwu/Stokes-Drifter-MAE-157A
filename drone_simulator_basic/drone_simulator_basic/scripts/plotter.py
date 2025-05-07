@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-file_name = "data/data_2025-05-01_17-25-12.csv"
+file_name = "data/data_2025-05-06_11-16-07.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
@@ -21,6 +21,15 @@ vx = data[:, 4]
 vy = data[:, 5]
 vz = data[:, 6]
 
+qw = data[:, 7]
+qx = data[:, 8]
+qy = data[:, 9]
+qz = data[:, 10]
+
+wx = data[:, 11]
+wy = data[:,12]
+wz = data[:, 13]
+
 f1 = data[:, 14]
 f2 = data[:, 15]
 f3 = data[:, 16]
@@ -29,6 +38,8 @@ f4 = data[:, 17]
 # initialize empty arrays
 xd, yd, zd = [], [], []
 vxdes, vydes, vzdes = [], [], []
+qwdes,qxdes,qydes,qzdes = [], [], [], []
+wxdes, wydes, wzdes = [], [], []
 
 for ti in t:
     traj = get_state_simple(ti)
@@ -38,6 +49,16 @@ for ti in t:
     vxdes.append(traj['v'][0])
     vydes.append(traj['v'][1])
     vzdes.append(traj['v'][2])
+    qwdes.append(traj['q'][0])
+    qxdes.append(traj['q'][1])
+    qydes.append(traj['q'][2])
+    qzdes.append(traj['q'][3])
+    wxdes.append(traj['w'][0])
+    wydes.append(traj['w'][1])
+    wzdes.append(traj['w'][2])
+
+
+
 
 # Convert to numpy arrays (optional, but convenient for plotting)
 xd = np.array(xd)
@@ -61,6 +82,24 @@ plt.title('Position vs Time')
 plt.legend()
 plt.grid()
 plt.ylim(-2,4)
+
+
+plt.figure(4)
+plt.plot(t, qw, label='qw')
+plt.plot(t, qx, label='qx')
+plt.plot(t, qy, label='qy')
+plt.plot(t, qz, label='qz')
+plt.plot(t, qwdes, label='qwd', linestyle='--')
+plt.plot(t, qxdes, label='qxd', linestyle='--')
+plt.plot(t, qydes, label='qyd', linestyle='--')
+plt.plot(t, qzdes, label='qzd', linestyle='--')
+plt.xlabel('Time [s]')
+plt.ylabel('Quaternion [m]')
+plt.title('Quaternion vs Time')
+plt.legend()
+plt.grid()
+plt.ylim(-0.25,0.25)
+
 
 # -- Motor Forces vs. Time --
 plt.figure(101)

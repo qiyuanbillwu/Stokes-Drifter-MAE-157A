@@ -8,6 +8,7 @@
 import numpy as np
 import datetime
 import os
+import matplotlib.pyplot as plt
 
 print("Current Working Directory:", os.getcwd())
 
@@ -21,7 +22,7 @@ from trajectory import get_state, get_state_simple
 ##########################################
 
 # Save data flag
-save_data = True
+save_data = False
 
 # Initial conditions
 t = 0.0
@@ -34,8 +35,8 @@ f = np.zeros(4)
 
 #assuming start from 1,1,1
 
-state[0] = 1
-state[1] = 1
+state[0] = -1
+state[1] = -1
 state[2] = 1   
 
 # vx, vy, vz
@@ -62,7 +63,7 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 3.0
+tf = 5.0
 
 # Simulation rate
 rate = 500
@@ -87,6 +88,12 @@ data = np.append(t,state)
 data = np.append(data,f)
 
 lastVelError = 0
+
+q_actual_log = []
+q_desired_log = []
+q_state_log = []
+time_log = []
+
 # Simulation loop
 running = True
 while running:
@@ -101,7 +108,16 @@ while running:
 
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller
-    
+
+    q_actual = np.array(trajectory['q'])
+    q_desired = np.array(q_des)
+    q_state = np.array(state[6:10])
+
+    q_state_log.append(q_state)
+    q_actual_log.append(q_actual)
+    q_desired_log.append(q_desired)
+    time_log.append(t)
+        
     f = inner_loop_controller(state, q_des, omega_des, T, l, dyn.d)
 
     # Propagate dynamics with control inputs
@@ -143,3 +159,31 @@ if save_data:
     print("Saving to:", file_path)
 
     np.savetxt("../data/"+file_name, data, delimiter=",")
+
+
+q_actual_log = np.array(q_actual_log)
+q_desired_log = np.array(q_desired_log)
+q_state_log = np.array(q_state_log)
+time_log = np.array(time_log)
+
+labels = ['q0', 'q1', 'q2', 'q3']
+
+plt.figure(figsize=(12, 8))
+for i in range(4):
+    plt.subplot(2, 2, i + 1)
+    plt.plot(time_log, q_actual_log[:, i], label='Trajectory')
+    plt.plot(time_log, q_desired_log[:, i], '--', label='Desired')
+    plt.plot(time_log, q_state_log[:, i], '--', label='State')
+    plt.title(f'Quaternion {labels[i]}')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+qw = data[:, 7]
+qx = data[:, 8]
+qy = data[:, 9]
+qz = data[:, 10]
