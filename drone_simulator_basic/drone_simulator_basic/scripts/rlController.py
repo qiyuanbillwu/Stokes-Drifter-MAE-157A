@@ -48,7 +48,6 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
     R_d = quat_to_rot(q_des)
 
     # =============
-    # how to apply a low-pass filter?
     a_dot = trajectory['j'] - Kp * e_vel - Kd * (e_vel - lastVelError) / dt
 
     lastVelError = e_vel
@@ -61,6 +60,8 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
     omega_des = omega
     omega_des[0] = -omega[1]
     omega_des[1] = omega[0]
+
+    #omega_des = [0,0,0];
 
     return T, q_des, omega_des, lastVelError
 
@@ -89,6 +90,7 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     
     # Angular velocity error
     omega_e = omega - R_e @ omega_des
+    #omega_e = omega - omega_des
     q_dot_e = qdot_from_omega(q_des, omega_e)
 
     # Control torque

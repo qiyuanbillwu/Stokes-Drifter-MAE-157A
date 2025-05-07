@@ -20,7 +20,7 @@ from trajectory import get_state, get_state_simple
 ############ Drone Simulation ############
 ##########################################
 
-# Save data flag
+# Save Data Flag
 save_data = True
 
 # Initial conditions
@@ -62,7 +62,7 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 3.0
+tf = 10.0
 
 # Simulation rate
 rate = 500
@@ -85,6 +85,8 @@ dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 # Initialize data array that contains useful info (probably should add more)
 data = np.append(t,state)
 data = np.append(data,f)
+data = np.append(data,[1,0,0,0])
+data = np.append(data,[0,0,0])
 
 lastVelError = 0
 # Simulation loop
@@ -99,9 +101,8 @@ while running:
     # Outer-loop controller
     T, q_des, omega_des, lastVelError = outer_loop_controller(state, trajectory, m, g, dt, lastVelError)
 
-    # Run inner-loop controller to get motor forces 
+    # Run inner-loop controller to get motor forces
     # Inner-loop controller
-    
     f = inner_loop_controller(state, q_des, omega_des, T, l, dyn.d)
 
     # Propagate dynamics with control inputs
@@ -117,8 +118,8 @@ while running:
     # Update data array (this can probably be done in a much cleaner way...)
     tmp = np.append(t,state)
     tmp = np.append(tmp,f)
-    #tmp = np.append(tmp,q_des)
-    #tmp = np.append(tmp,omega_des)
+    tmp = np.append(tmp,q_des)
+    tmp = np.append(tmp,omega_des)
     data = np.vstack((data,tmp))
 
     # Update time
