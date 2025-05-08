@@ -5,7 +5,7 @@ from trajectory import get_state, get_state_simple
 from util import angular_velocity_body_wxyz
 
 # Update with actual file name in the data director
-file_name = "data/simpleTraj.csv"
+file_name = "data\data_2025-05-08_11-31-06.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
