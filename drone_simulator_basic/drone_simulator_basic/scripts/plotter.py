@@ -59,9 +59,6 @@ for ti in t:
     wydes.append(traj['w'][1])
     wzdes.append(traj['w'][2])
 
-
-
-
 # Convert to numpy arrays (optional, but convenient for plotting)
 xd = np.array(xd)
 yd = np.array(yd)

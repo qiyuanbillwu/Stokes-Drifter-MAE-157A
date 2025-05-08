@@ -241,3 +241,8 @@ def angular_velocity_body_wxyz(q1_wxyz, q2_wxyz, dt):
     omega_body = r1.inv().apply(omega_world)
 
     return omega_body
+
+def noise_ify(idealValue, mu, sigma):
+    #mu, sigma = 0, 0.1 # example mean and standard deviation
+    s = np.random.normal(mu, sigma, 1)
+    return idealValue * (1 + s);
