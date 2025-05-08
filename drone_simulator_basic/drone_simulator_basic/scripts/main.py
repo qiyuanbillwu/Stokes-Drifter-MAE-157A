@@ -22,7 +22,7 @@ from trajectory import get_state, get_state_simple
 ##########################################
 
 # Save data flag
-save_data = False
+save_data = True
 
 # Initial conditions
 t = 0.0

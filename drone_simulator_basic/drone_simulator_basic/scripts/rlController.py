@@ -17,8 +17,8 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     axdes, aydes, azdes = trajectory['a']
 
     # Position and velocity errors
-    # e_pos = np.array([xd, yd, zd]) - pos
-    # e_vel = np.array([vxdes, vydes, vzdes]) - vel
+    #e_pos = np.array([xd, yd, zd]) - pos
+    #e_vel = np.array([vxdes, vydes, vzdes]) - vel
     e_pos = pos - np.array([xd, yd, zd]) 
     e_vel = vel - np.array([vxdes, vydes, vzdes]) 
 
@@ -69,10 +69,13 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
 
     # omega is in the form of (wy, -wx, 0)
     # want omega_des in the form (wx, wy, 0)
-    omega = R_d.T @ adot_hat
-    omega_des = omega
-    omega_des[0] = -omega[1]
-    omega_des[1] = omega[0]
+    #omega = R_d.T @ adot_hat
+    #omega_des = omega
+    #omega_des[0] = -omega[1]
+    #omega_des[1] = omega[0]
+
+    omega_des = np.cross(a_hat, adot_hat)
+    omega_des[2] = 0  # yaw is not tracked
 
     return T, q_des, omega_des, lastVelError, prev_filtered_derivative
 
