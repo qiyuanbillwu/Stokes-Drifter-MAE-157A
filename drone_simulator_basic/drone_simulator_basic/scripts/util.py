@@ -151,10 +151,6 @@ def quat_conjugate(q):
     w, x, y, z = q
     return np.array([w, -x, -y, -z])
 
-def quaternion_error(q_des, q_curr):
-    # Compute q_e = q_des^* ⊗ q_curr
-    return quat_multiply(quat_conjugate(q_des), q_curr)
-
 def qdot_from_omega(q, omega):
     """Compute q_dot from quaternion q and angular velocity omega"""
     omega_quat = np.array([0, *omega])
