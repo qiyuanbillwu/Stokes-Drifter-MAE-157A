@@ -89,12 +89,13 @@ Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
 Ixx = 0.005; # [kg/m2]
 Iyy = 0.005; # [kg/m2]
 Izz = 0.002; # [kg/m2]
+J = np.diag([Ixx,Iyy,Izz])
 
 printStates(t,f,state);
 print("")
 
 # Initialize dynamics
-dyn = dynamics.dynamics(np.array([g,m,l,Cd,Cl,Ixx,Iyy,Izz]), dt)
+dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 
 # Initialize data array that contains useful info (probably should add more)
 data = np.append(t,state)
