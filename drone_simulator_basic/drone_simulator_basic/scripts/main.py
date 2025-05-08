@@ -21,7 +21,7 @@ from trajectory import get_state, get_state_simple
 ############ Drone Simulation ############
 ##########################################
 
-# Save data flag
+# Save Data Flag
 save_data = True
 
 # Initial conditions
@@ -86,6 +86,8 @@ dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 # Initialize data array that contains useful info (probably should add more)
 data = np.append(t,state)
 data = np.append(data,f)
+data = np.append(data,[1,0,0,0])
+data = np.append(data,[0,0,0])
 
 lastVelError = 0
 prev_filtered_derivative = 0
@@ -107,7 +109,7 @@ while running:
     # Outer-loop controller
     T, q_des, omega_des, lastVelError, prev_filtered_derivative = outer_loop_controller(state, trajectory, m, g, dt, lastVelError, prev_filtered_derivative)
 
-    # Run inner-loop controller to get motor forces 
+    # Run inner-loop controller to get motor forces
     # Inner-loop controller
 
     q_actual = np.array(trajectory['q'])
@@ -134,8 +136,8 @@ while running:
     # Update data array (this can probably be done in a much cleaner way...)
     tmp = np.append(t,state)
     tmp = np.append(tmp,f)
-    #tmp = np.append(tmp,q_des)
-    #tmp = np.append(tmp,omega_des)
+    tmp = np.append(tmp,q_des)
+    tmp = np.append(tmp,omega_des)
     data = np.vstack((data,tmp))
 
     # Update time

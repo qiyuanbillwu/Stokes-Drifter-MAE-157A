@@ -174,34 +174,38 @@ def innerFunc_case1(t):
 # Test Cases
 def innerFunc_case2(t):
     # Linear Ramp, starting at 0,0,0 and going to some rollF, yawF, pitchY
-    rF = np.deg2rad(-45);
-    yF = np.deg2rad(45);
-    pF = np.deg2rad(45);
-    tf = 3.0;
+    dt = 1/500;
+    xAngF = np.deg2rad(-80);
+    yAngF = np.deg2rad(-80);
+    zAngF = np.deg2rad(20);
+    tf = 4.0;
     
-    wx = rF / tf;
+    roll_dot = xAngF / tf;
     #wx = 0;
-    wy = yF / tf;
+    pitch_dot = yAngF / tf;
     #wy = 0;
-    wz = pF / tf;
+    yaw_dot = zAngF / tf;
     #wz = 0;
 
-    omega_des = [wx, wy, wz];
-    T = 0;
+    omega_des = [roll_dot, pitch_dot, yaw_dot];
+    T = 10;
 
     if (t > tf): 
-        omega_des = [0, 0, 0];
         t = tf;
 
-    roll = wx * t;
-    pitch = wy * t;
-    yaw = wz * t;
+    roll = roll_dot * t;
+    pitch = pitch_dot * t;
+    yaw = yaw_dot * t;
 
     q_des = util.euler_to_quaternion(roll, pitch, yaw)
+    omega_des = util.euler_rates_to_body_rates_XYZ(roll, pitch, yaw, roll_dot, pitch_dot, yaw_dot)
+
+    if (t > tf): 
+        omega_des = [0,0,0];
 
     return T, q_des, omega_des;
 
-tf = 10.0;
+tf = 5.0;
 dataOut = sim(dt, tf, f0, s0, dyn, innerFunc_case2, False);
 plotQuat(dataOut)
 plotW(dataOut)

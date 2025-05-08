@@ -69,13 +69,10 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
 
     # omega is in the form of (wy, -wx, 0)
     # want omega_des in the form (wx, wy, 0)
-    #omega = R_d.T @ adot_hat
-    #omega_des = omega
-    #omega_des[0] = -omega[1]
-    #omega_des[1] = omega[0]
-
-    omega_des = np.cross(a_hat, adot_hat)
-    omega_des[2] = 0  # yaw is not tracked
+    omega = R_d.T @ adot_hat
+    omega_des = omega
+    omega_des[0] = -omega[1]
+    omega_des[1] = omega[0]
 
     return T, q_des, omega_des, lastVelError, prev_filtered_derivative
 
@@ -107,7 +104,7 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     
     # Angular velocity error
     omega_e = omega - R_e @ omega_des
-    q_dot_e = qdot_from_omega(q_e, omega_e)
+    q_dot_e = qdot_from_omega(q_des, omega_e)
 
     # Control torque
     tau = -s * Kp @ q_e[1:] - Kd @ omega_e - Lambda * s * q_dot_e[1:]

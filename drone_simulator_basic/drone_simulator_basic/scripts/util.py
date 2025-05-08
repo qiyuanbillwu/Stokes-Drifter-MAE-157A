@@ -92,49 +92,49 @@ def cross_matrix(v):
         [-vy,  vx,   0 ]
     ])
 
-# def allocation_matrix(l,d):
-#     #  Front
-#     #    ^
-#     #    |
-#     # 1      2
-#     #    |
-#     # 4      3
-
-#     # 1 CCW
-#     # 2 CW
-#     # 3 CCW
-#     # 4 CW
-
-#     return np.array([
-#     [1, 1, 1, 1],        # Total thrust
-#     [-l, l, l, -l],      # Roll
-#     [l, l, -l, -l],      # Pitch
-#     [d, -d, d, -d]       # Yaw
-#     ])
-
-# ==============================================
-# changed by Bill, alternative allocation matrix
-# ==============================================
-
 def allocation_matrix(l,d):
     #  Front
     #    ^
     #    |
-    # 2      1
+    # 1      2
     #    |
-    # 3      4
+    # 4      3
 
-    # 1 CW
-    # 2 CCW
-    # 3 CW
-    # 4 CCW
+    # 1 CCW
+    # 2 CW
+    # 3 CCW
+    # 4 CW
 
     return np.array([
     [1, 1, 1, 1],        # Total thrust
-    [0, -l, 0, l],      # Roll
-    [-l, 0, l, 0],      # Pitch
-    [d, -d, d, -d]       # Yaw
+    [l, l, -l, -l],      # Roll
+    [l, -l, -l, l],      # Pitch
+    [-d, d, -d, d]       # Yaw
     ])
+
+# ==============================================
+# alternative allocation matrix
+# ==============================================
+
+# def allocation_matrix(l,d):
+#     #  Front
+#     #    ^
+#     #    |
+#     # 2      1
+#     #    |
+#     # 3      4
+
+#     # 1 CW
+#     # 2 CCW
+#     # 3 CW
+#     # 4 CCW
+
+#     return np.array([
+#     [1, 1, 1, 1],        # Total thrust
+#     [0, -l, 0, l],      # Roll
+#     [-l, 0, l, 0],      # Pitch
+#     [d, -d, d, -d]       # Yaw
+#     ])
 
 def quat_multiply(q1, q2):
     # Hamilton product of two quaternions
@@ -156,30 +156,88 @@ def qdot_from_omega(q, omega):
     omega_quat = np.array([0, *omega])
     return 0.5 * quat_multiply(q, omega_quat)
 
+def quat_multiply(q, r):
+    """
+    Hamilton product q ⊗ r for quaternions in (w, x, y, z) format.
+    """
+    w1, x1, y1, z1 = q
+    w2, x2, y2, z2 = r
+    return np.array([
+        w1*w2 - x1*x2 - y1*y2 - z1*z2,
+        w1*x2 + x1*w2 + y1*z2 - z1*y2,
+        w1*y2 - x1*z2 + y1*w2 + z1*x2,
+        w1*z2 + x1*y2 - y1*x2 + z1*w2
+    ])
+
 import numpy as np
 
-def euler_to_quaternion(roll, pitch, yaw):
+def euler_rates_to_body_rates_XYZ(roll, pitch, yaw, roll_dot, pitch_dot, yaw_dot):
     """
-    Convert Euler angles to quaternion.
-    
+    Convert XYZ Euler angle derivatives to body angular velocity (omega_x, omega_y, omega_z).
+
     Args:
-        roll: Rotation around X-axis (in radians)
-        pitch: Rotation around Y-axis (in radians)
-        yaw: Rotation around Z-axis (in radians)
-    
+        roll: float, roll angle (X), radians
+        pitch: float, pitch angle (Y), radians
+        yaw: float, yaw angle (Z), radians
+        roll_dot: float, roll rate (d/dt), radians/sec
+        pitch_dot: float, pitch rate (d/dt), radians/sec
+        yaw_dot: float, yaw rate (d/dt), radians/sec
+
     Returns:
-        A tuple (w, x, y, z) representing the quaternion.
+        np.array of shape (3,), body angular velocity [omega_x, omega_y, omega_z]
     """
-    cy = np.cos(yaw * 0.5)
-    sy = np.sin(yaw * 0.5)
-    cp = np.cos(pitch * 0.5)
-    sp = np.sin(pitch * 0.5)
-    cr = np.cos(roll * 0.5)
-    sr = np.sin(roll * 0.5)
+    sr = np.sin(roll)
+    cr = np.cos(roll)
+    sp = np.sin(pitch)
+    cp = np.cos(pitch)
+    sy = np.sin(yaw)
+    cy = np.cos(yaw)
 
-    w = cr * cp * cy + sr * sp * sy
-    x = sr * cp * cy - cr * sp * sy
-    y = cr * sp * cy + sr * cp * sy
-    z = cr * cp * sy - sr * sp * cy
+    # Euler XYZ rates to body rates matrix
+    J = np.array([
+        [1, 0, -sp],
+        [0, cr, sr * cp],
+        [0, -sr, cr * cp]
+    ])
 
-    return (w, x, y, z)
+    euler_dot = np.array([roll_dot, pitch_dot, yaw_dot])
+
+    omega = J @ euler_dot
+
+    return omega
+
+from scipy.spatial.transform import Rotation as R
+
+def angular_velocity_body_wxyz(q1_wxyz, q2_wxyz, dt):
+    """
+    Estimate angular velocity in the body frame from two quaternions (w,x,y,z) over time dt.
+
+    Args:
+        q1_wxyz : quaternion at time t (w,x,y,z)
+        q2_wxyz : quaternion at time t+dt (w,x,y,z)
+        dt      : timestep (float)
+
+    Returns:
+        omega_body : angular velocity in body frame at time t, shape (3,)
+    """
+    # Convert (w,x,y,z) → (x,y,z,w) for use with scipy
+    q1_xyzw = np.array([q1_wxyz[1], q1_wxyz[2], q1_wxyz[3], q1_wxyz[0]])
+    q2_xyzw = np.array([q2_wxyz[1], q2_wxyz[2], q2_wxyz[3], q2_wxyz[0]])
+
+    # Rotation objects
+    r1 = R.from_quat(q1_xyzw)
+    r2 = R.from_quat(q2_xyzw)
+
+    # Relative rotation: R_delta = R2 * R1⁻¹
+    r_delta = r2 * r1.inv()
+
+    # Axis-angle representation → rotation vector (ω·dt)
+    rotvec = r_delta.as_rotvec()
+
+    # Angular velocity in world frame
+    omega_world = rotvec / dt
+
+    # Convert to body frame at time t
+    omega_body = r1.inv().apply(omega_world)
+
+    return omega_body
