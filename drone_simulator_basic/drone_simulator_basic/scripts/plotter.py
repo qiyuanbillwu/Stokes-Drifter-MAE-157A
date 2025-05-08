@@ -185,9 +185,9 @@ wx_d_calc[1] = 0;
 wy_d_calc[1] = 0;
 wz_d_calc[1] = 0;
 
-plt.plot(t, wx_d_calc, color="red", linestyle=":")
-plt.plot(t, wy_d_calc, color="blue", linestyle=":")
-plt.plot(t, wz_d_calc, color="green", linestyle=":")
+#plt.plot(t, wx_d_calc, color="red", linestyle=":")
+#plt.plot(t, wy_d_calc, color="blue", linestyle=":")
+#plt.plot(t, wz_d_calc, color="green", linestyle=":")
 
 plt.plot(t, wx_d, color="red", linestyle="--")
 plt.plot(t, wy_d, color="blue", linestyle="--")
