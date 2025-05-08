@@ -5,7 +5,7 @@ from trajectory import get_state, get_state_simple
 from util import angular_velocity_body_wxyz
 
 # Update with actual file name in the data director
-file_name = "data/data_2025-05-08_10-48-53.csv"
+file_name = "data/simpleTraj.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
@@ -22,6 +22,12 @@ z = data[:, 3]
 vx = data[:, 4]
 vy = data[:, 5]
 vz = data[:, 6]
+
+qw = data[:, 7]
+qx = data[:, 8]
+qy = data[:, 9]
+qz = data[:, 10]
+
 
 f1 = data[:, 14]
 f2 = data[:, 15]
@@ -165,11 +171,6 @@ plt.plot(t, qy_d, color="blue", linestyle="--")
 plt.plot(t, qz_d, color="green", linestyle="--")
 
 # -- Performance of Outer + Inner Controller --
-plt.figure(103)
-plt.title("Desired vs Actual Angular Velocity")
-plt.plot(t, wx, color="red")
-plt.plot(t, wy, color="blue")
-plt.plot(t, wz, color="green")
 
 wx_d_calc = np.zeros(len(t))
 wy_d_calc = np.zeros(len(t))
