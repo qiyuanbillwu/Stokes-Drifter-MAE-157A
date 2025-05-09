@@ -1,12 +1,12 @@
 
 import numpy as np
-from util import quat_to_rot, quat_multiply, quat_conjugate, quaternion_error, qdot_from_omega, get_a_dot_hat, allocation_matrix
+from util import quat_to_rot, quat_multiply, quat_conjugate, qdot_from_omega, get_a_dot_hat, allocation_matrix
 #must always account for double covering with quaternions to prevent unwinding
 
-#rlController works for just vertical position change
+#qy is not correct for some reason
 
 #get thrust and desired orientation
-def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
+def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_filtered_derivative):
     # Extract current state
     pos = state[0:3]
     vel = state[3:6]
@@ -17,8 +17,8 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
     axdes, aydes, azdes = trajectory['a']
 
     # Position and velocity errors
-    # e_pos = np.array([xd, yd, zd]) - pos
-    # e_vel = np.array([vxdes, vydes, vzdes]) - vel
+    #e_pos = np.array([xd, yd, zd]) - pos
+    #e_vel = np.array([vxdes, vydes, vzdes]) - vel
     e_pos = pos - np.array([xd, yd, zd]) 
     e_vel = vel - np.array([vxdes, vydes, vzdes]) 
 
@@ -49,7 +49,19 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
 
     # =============
     # how to apply a low-pass filter?
-    a_dot = trajectory['j'] - Kp * e_vel - Kd * (e_vel - lastVelError) / dt
+
+    raw_derivative = (e_vel - lastVelError) / dt
+
+    alpha = 0.2
+
+    # Apply low-pass filter to derivative only
+    filtered_derivative = alpha * prev_filtered_derivative + (1 - alpha) * raw_derivative
+
+    prev_filtered_derivative = filtered_derivative
+
+    a_dot = trajectory['j'] - Kp * e_vel - Kd * filtered_derivative
+
+    
 
     lastVelError = e_vel
 
@@ -57,13 +69,17 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
 
     # omega is in the form of (wy, -wx, 0)
     # want omega_des in the form (wx, wy, 0)
-    omega = R_d.T @ adot_hat
-    omega_des = omega
-    omega_des[0] = -omega[1]
-    omega_des[1] = omega[0]
+    #omega = R_d.T @ adot_hat
+    #omega_des = omega
+    #omega_des[0] = -omega[1]
+    #omega_des[1] = omega[0]
 
-    return T, q_des, omega_des, lastVelError
+    omega_des = np.cross(a_hat, adot_hat)
+    omega_des[2] = 0  # if yaw is not tracked
 
+    return T, q_des, omega_des, lastVelError, prev_filtered_derivative
+
+#prob correct
 def inner_loop_controller(state, q_des, omega_des, T, l, d):
     # Extract current quaternion and angular velocity
     q_curr = state[6:10]       # [qw, qx, qy, qz]
@@ -71,16 +87,17 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
 
     # ============================
     # Orientation error quaternion: q_e = q_des^* ⊗ q_curr
-    # this should be q_des conjugate, but somehow q_des works better
-    # q_e = quaternion_error(quat_conjugate(q_des), q_curr)
-    q_e = quaternion_error(q_des, q_curr)
-    # print("q_e: ", q_e)
+    q_e = quat_multiply(quat_conjugate(q_des), q_curr)
+  # print("q_e: ", q_e)
 
     # PD gains
-    Kp = np.array([0.5, 0.5, 0.5])
-    Kd = np.array([0.3, 0.3, 0.3])   
+    Kp_vec = np.array([0.4, 0.4, 0.4])
+    Kd_vec = np.array([0.2, 0.2, 0.2])
 
-    Lambda = np.array([0.5, 0.5, 0.3])
+    Kp = np.diag(Kp_vec)
+    Kd = np.diag(Kd_vec) 
+
+    Lambda = np.array([0.2, 0.2, 0.2])
 
     # Sign correction to avoid unwinding
     s = np.sign(q_e[0]) if q_e[0] != 0 else 1
@@ -93,7 +110,7 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     q_dot_e = qdot_from_omega(q_des, omega_e)
 
     # Control torque
-    tau = -s * Kp * q_e[1:] - Kd * omega_e - Lambda * s * q_dot_e[1:]
+    tau = -s * Kp @ q_e[1:] - Kd @ omega_e - Lambda * s * q_dot_e[1:]
 
     # Mixer matrix to solve for motor forces
     mix = allocation_matrix(l,d)
