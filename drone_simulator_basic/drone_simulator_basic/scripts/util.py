@@ -159,3 +159,4 @@ def qdot_from_omega(q, omega):
     """Compute q_dot from quaternion q and angular velocity omega"""
     omega_quat = np.array([0, *omega])
     return 0.5 * quat_multiply(q, omega_quat)
+
