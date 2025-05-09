@@ -4,11 +4,7 @@ import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-<<<<<<< HEAD
 file_name = "data/simpleTraj.csv"
-=======
-file_name = "data/data_2025-05-01_17-25-12.csv"
->>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
@@ -25,15 +21,12 @@ vx = data[:, 4]
 vy = data[:, 5]
 vz = data[:, 6]
 
-<<<<<<< HEAD
 qw = data[:, 7]
 qx = data[:, 8]
 qy = data[:, 9]
 qz = data[:, 10]
 
 
-=======
->>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
 f1 = data[:, 14]
 f2 = data[:, 15]
 f3 = data[:, 16]
@@ -152,7 +145,6 @@ plt.grid()
 print("Final Actual Position:   x = {:.3f}, y = {:.3f}, z = {:.3f}".format(x[-1], y[-1], z[-1]))
 print("Final Desired Position:  xd = {:.3f}, yd = {:.3f}, zd = {:.3f}".format(xd[-1], yd[-1], zd[-1]))
 
-<<<<<<< HEAD
 # -- Performance of Outer + Inner Controller --
 plt.figure(102)
 plt.title("Desired vs Actual Orientation")
@@ -162,23 +154,15 @@ plt.plot(t, qy, color="blue")
 plt.plot(t, qz, color="green")
 
 #plt.plot(t, qw_d, color="purple", linestyle="--")
-plt.plot(t, qx_d, color="red", linestyle="--")
-plt.plot(t, qy_d, color="blue", linestyle="--")
-plt.plot(t, qz_d, color="green", linestyle="--")
+plt.plot(t, qxdes, color="red", linestyle="--")
+plt.plot(t, qydes, color="blue", linestyle="--")
+plt.plot(t, qzdes, color="green", linestyle="--")
 
 # -- Performance of Outer + Inner Controller --
 
 wx_d_calc = np.zeros(len(t))
 wy_d_calc = np.zeros(len(t))
 wz_d_calc = np.zeros(len(t))
-
-dt = (t[3] - t[2]);
-
-print(dt)
-for i in range(0,len(t)-1):
-    qd2 = np.array([qw_d[i], qx_d[i], qy_d[i], qz_d[i]]);
-    qd1 = np.array([qw_d[i+1], qx_d[i+1], qy_d[i+1], qz_d[i+1]]);
-    wx_d_calc[i+1], wy_d_calc[i+1], wz_d_calc[i+1] = angular_velocity_body_wxyz(qd1, qd2, dt)
 
 wx_d_calc[1] = 0;
 wy_d_calc[1] = 0;
@@ -188,15 +172,4 @@ plt.plot(t, wx_d_calc, color="red", linestyle=":")
 plt.plot(t, wy_d_calc, color="blue", linestyle=":")
 plt.plot(t, wz_d_calc, color="green", linestyle=":")
 
-plt.plot(t, wx_d, color="red", linestyle="--")
-plt.plot(t, wy_d, color="blue", linestyle="--")
-plt.plot(t, wz_d, color="green", linestyle="--")
-
-#plt.figure(104)
-#plt.plot(t, wx_d_calc/wx_d);
-#plt.plot(t, wy_d_calc/wy_d);
-#plt.plot(t, wz_d_calc/wz_d);
-
-=======
->>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
 plt.show()
