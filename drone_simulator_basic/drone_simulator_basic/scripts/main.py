@@ -16,6 +16,7 @@ print("Current Working Directory:", os.getcwd())
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
 from trajectory import get_state, get_state_simple
+from constants import g, m, l, Cd, Cl, J
 
 ##########################################
 ############ Drone Simulation ############
@@ -37,7 +38,7 @@ f = np.zeros(4)
 
 state[0] = -1
 state[1] = -1
-state[2] = 1   
+state[2] = 1  
 
 # vx, vy, vz
 # Zero Velocity
@@ -63,22 +64,22 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 5.0
+tf = 5
 
 # Simulation rate
 rate = 500
 dt = 1./rate
 
-# Gravity
-g = 9.81
+# # Gravity
+# g = 9.81
 
-# Other parameters?
-#placeholder for now
-m = 0.7437  # mass of drone [kg]
-l = 0.115   # meters [m]
-Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
-Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
-J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
+# # Other parameters?
+# #placeholder for now
+# m = 0.7437  # mass of drone [kg]
+# l = 0.115   # meters [m]
+# Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
+# Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
+# J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
 
 # Initialize dynamics
 dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
@@ -126,7 +127,9 @@ while running:
     # Propagate dynamics with control inputs
     #print(state.shape)
     #print(f.shape)
-    state = dyn.propagate(state, f, dt)
+    # state = dyn.propagate(state, f, dt)
+    state = dyn.propagateRK4(state, f, dt)
+    # print("state (dynamics): ", state)
  
     # If z to low then indicate crash and end simulation
     if state[2] < 0.1:
@@ -144,7 +147,7 @@ while running:
     t += dt 
 
     # If time exceeds final time then stop simulator
-    print(t)
+    # print(t)
     if t >= tf:
         running = False
 
