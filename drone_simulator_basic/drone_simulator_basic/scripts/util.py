@@ -219,7 +219,6 @@ def euler_rates_to_body_rates_XYZ(roll, pitch, yaw, roll_dot, pitch_dot, yaw_dot
 
     omega = J @ euler_dot
 
-<<<<<<< HEAD
     return omega
 
 from scipy.spatial.transform import Rotation as R
@@ -262,6 +261,3 @@ def noise_ify(idealValue, mu, sigma):
     #mu, sigma = 0, 0.1 # example mean and standard deviation
     s = np.random.normal(mu, sigma, 1)
     return idealValue * (1 + s);
-=======
-    return omega
->>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
