@@ -28,7 +28,7 @@ class dynamics:
 		# Get thrust from motor forces f
 		A = allocation_matrix(self.l,self.d);
 		[T,tauX,tauY,tauZ] = np.matmul(A,f);
-		#print(T,tauX,tauY,tauZ);
+		# print(T,tauX,tauY,tauZ);
 		
 		# Velocities
 		dx = state[3]
@@ -39,14 +39,16 @@ class dynamics:
 		dvx = R[0,2] * T  / self.m
 		dvy = R[1,2] * T  / self.m
 		dvz = R[2,2] * T  / self.m - self.g
-		#print("Rotation Matrix = ", R)
+		# print("Rotation Matrix = ", R)
 		#print("Thrust = ", T)
 		#print("Mass = ", self.m)
 
 		# Orientation
-		#Rdot = np.matmul(R, self.cross_matrix(w));
-		#dq = self.rot_to_quat(Rdot);
+		# Rdot = np.matmul(R, cross_matrix(w));
+		# dq = rot_to_quat(Rdot);
+		# print("dq: ", dq)
 		dq = 0.5 * quat_multiply(q, [0, w[0], w[1], w[2]])
+		# print(0.5 * quat_multiply(q, [0, w[0], w[1], w[2]]))
 		
 		dqw = dq[0];
 		dqx = dq[1];
