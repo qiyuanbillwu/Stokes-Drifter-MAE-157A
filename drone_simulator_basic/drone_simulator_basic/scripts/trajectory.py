@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from util import get_a_dot_hat, cross_matrix, allocation_matrix
-from constants import J, l, d, m, g
+from constants import J, l, d, m
 
 a_matrix  = allocation_matrix(l, d)
 
@@ -22,6 +22,9 @@ def compute_A(t0, t1):
             A[7, col] = col * (col - 1) * (col - 2) * t1**(col - 3)
     return A
 
+# global constants
+g = 9.81
+m = 0.5
 dt = 0.01
 
 # boundary points and conditions
@@ -206,8 +209,8 @@ def get_state_simple(t):
     #x2, y2, z2 = 1, 0, 1 
 
     # moving along the y axis
-    # x0, y0, z0 = 0, -1, 1
-    # x2, y2, z2 = 0, 1, 1 
+    x0, y0, z0 = 0, -1, 1
+    x2, y2, z2 = 0, 1, 1 
 
     # moving along the z axis
     # x0, y0, z0 = 0, 0, 0.5
@@ -329,11 +332,11 @@ def get_state_simple(t):
 
     # Combine total thrust and torques
     tau_full = np.array([T, *tau])
-    # print("tau_full (traj): ", tau_full)
+    # print("tau_full: ", tau_full)
 
     # Solve for motor forces
     f = np.linalg.solve(a_matrix, tau_full)
-    # print("f (traj): ", f)
+    # print("f: ", f)
     
     state = {
     "r": r,         # position
@@ -346,6 +349,74 @@ def get_state_simple(t):
     "s": s,         # snap
     "f": f          # forces
     }
-
+    #print(state)
     return state
 
+# get_state(0)
+# get_state_simple(0.01)
+
+pos = []
+vel = []
+acc = []
+w = []
+wdot = []
+forces = []
+
+ts = np.arange(t0, t2, dt)
+
+for t in ts:
+    state = get_state_simple(t)
+    # print(state['f'])
+    pos.append(state['r'])
+    vel.append(state['v'])
+    acc.append(state['a'])
+    w.append(state['w'])
+    wdot.append(state['wdot'])
+    forces.append(state['f'])
+
+pos = np.array(pos)
+vel = np.array(vel)
+acc = np.array(acc)
+w = np.array(w)
+wdot = np.array(wdot)
+forces = np.array(forces)
+# print(ts)
+# print(forces[:,1])
+
+# fig = plt.figure(1)
+# ax = fig.add_subplot(111, projection='3d')
+# ax.plot(pos[:,0], pos[:,1], pos[:,2], label='Drone trajectory')
+
+# plt.figure(2)
+# plt.plot(ts, vel[:, 0], label = "v_x")
+# plt.plot(ts, vel[:, 1], label = "v_y", linestyle='--')
+# plt.plot(ts, vel[:, 2], label = "v_z", linestyle='--')
+# plt.legend()
+
+# plt.figure(3)
+# plt.plot(ts, acc[:, 0], label = "a_x")
+# plt.plot(ts, acc[:, 1], label = "a_y", linestyle='--')
+# plt.plot(ts, acc[:, 2], label = "a_z", linestyle='--')
+# plt.legend()
+
+# plt.figure(4)
+# plt.plot(ts, w[:, 0], label = "w_x")
+# plt.plot(ts, w[:, 1], label = "w_y", linestyle='--')
+# plt.plot(ts, w[:, 2], label = "w_z", linestyle='--')
+# plt.legend()
+
+# plt.figure(5)
+# plt.plot(ts, wdot[:, 0], label = "wdot_x")
+# plt.plot(ts, wdot[:, 1], label = "wdot_y", linestyle='--')
+# plt.plot(ts, wdot[:, 2], label = "wdot_z", linestyle='--')
+# plt.legend()
+
+# plt.figure(6)
+# plt.plot(ts, forces[:, 0], label = 'f1')
+# plt.plot(ts, forces[:, 1], label = 'f2')
+# plt.plot(ts, forces[:, 2], label = 'f3')
+# plt.plot(ts, forces[:, 3], label = 'f4')
+# plt.legend()
+# plt.show()
+
+# get_state(0.01)
