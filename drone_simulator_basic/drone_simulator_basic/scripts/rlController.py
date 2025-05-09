@@ -49,6 +49,7 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
 
     # =============
     # how to apply a low-pass filter?
+<<<<<<< HEAD
 
     raw_derivative = (e_vel - lastVelError) / dt
 
@@ -62,6 +63,9 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     a_dot = trajectory['j'] - Kp * e_vel - Kd * filtered_derivative
 
     
+=======
+    a_dot = trajectory['j'] - Kp * e_vel - Kd * (e_vel - lastVelError) / dt
+>>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
 
     lastVelError = e_vel
 
@@ -74,10 +78,14 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     #omega_des[0] = -omega[1]
     #omega_des[1] = omega[0]
 
+<<<<<<< HEAD
     omega_des = np.cross(a_hat, adot_hat)
     omega_des[2] = 0  # if yaw is not tracked
 
     return T, q_des, omega_des, lastVelError, prev_filtered_derivative
+=======
+    return T, q_des, omega_des, lastVelError
+>>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
 
 #prob correct
 def inner_loop_controller(state, q_des, omega_des, T, l, d):

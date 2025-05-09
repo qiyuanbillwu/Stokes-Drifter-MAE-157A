@@ -2,10 +2,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
-from util import angular_velocity_body_wxyz
 
 # Update with actual file name in the data director
+<<<<<<< HEAD
 file_name = "data/simpleTraj.csv"
+=======
+file_name = "data/data_2025-05-01_17-25-12.csv"
+>>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
@@ -18,30 +21,23 @@ t = data[:, 0]
 x = data[:, 1]
 y = data[:, 2]
 z = data[:, 3]
-
 vx = data[:, 4]
 vy = data[:, 5]
 vz = data[:, 6]
 
+<<<<<<< HEAD
 qw = data[:, 7]
 qx = data[:, 8]
 qy = data[:, 9]
 qz = data[:, 10]
 
 
+=======
+>>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
 f1 = data[:, 14]
 f2 = data[:, 15]
 f3 = data[:, 16]
 f4 = data[:, 17]
-
-qw_d = data[:, 18]
-qx_d = data[:, 19]
-qy_d = data[:, 20]
-qz_d = data[:, 21]
-
-wx_d = data[:, 22]
-wy_d = data[:, 23]
-wz_d = data[:, 24]
 
 # initialize empty arrays
 xd, yd, zd = [], [], []
@@ -75,12 +71,12 @@ vzdes = np.array(vzdes)
 
 # --- Position vs Time ---
 plt.figure(1)
-plt.plot(t, x, label='x', color="red")
-plt.plot(t, y, label='y', color="blue")
-plt.plot(t, z, label='z', color="green")
-plt.plot(t, xd, label='xd', linestyle='--', color="red")
-plt.plot(t, yd, label='yd', linestyle='--', color="blue")
-plt.plot(t, zd, label='zd', linestyle='--', color="green")
+plt.plot(t, x, label='x')
+plt.plot(t, y, label='y')
+plt.plot(t, z, label='z')
+plt.plot(t, xd, label='xd', linestyle='--')
+plt.plot(t, yd, label='yd', linestyle='--')
+plt.plot(t, zd, label='zd', linestyle='--')
 plt.xlabel('Time [s]')
 plt.ylabel('Position [m]')
 plt.title('Position vs Time')
@@ -122,6 +118,7 @@ plt.plot(t, equForce, label="Hovering Force [N]");
 plt.legend();
 
 # Legend
+
 # --- 3D Drone Trajectory ---
 fig = plt.figure(2)
 ax = fig.add_subplot(111, projection='3d')
@@ -151,9 +148,11 @@ plt.title('Velocity vs Time')
 plt.legend()
 plt.grid()
 
+
 print("Final Actual Position:   x = {:.3f}, y = {:.3f}, z = {:.3f}".format(x[-1], y[-1], z[-1]))
 print("Final Desired Position:  xd = {:.3f}, yd = {:.3f}, zd = {:.3f}".format(xd[-1], yd[-1], zd[-1]))
 
+<<<<<<< HEAD
 # -- Performance of Outer + Inner Controller --
 plt.figure(102)
 plt.title("Desired vs Actual Orientation")
@@ -198,4 +197,6 @@ plt.plot(t, wz_d, color="green", linestyle="--")
 #plt.plot(t, wy_d_calc/wy_d);
 #plt.plot(t, wz_d_calc/wz_d);
 
+=======
+>>>>>>> parent of 52d0395 (Debugged for a loong time but no luck)
 plt.show()
