@@ -4,6 +4,7 @@
 # Description: Dynamics for drone simulator
 
 import numpy as np
+
 from util import quat_to_rot, rot_to_quat, cross_matrix, allocation_matrix, quat_multiply
 
 class dynamics: 
@@ -44,6 +45,7 @@ class dynamics:
 		#print("Mass = ", self.m)
 
 		# Orientation
+
 		# Rdot = np.matmul(R, cross_matrix(w));
 		# dq = rot_to_quat(Rdot);
 		# print("dq: ", dq)
@@ -69,9 +71,14 @@ class dynamics:
 	# Numerical integration scheme (can do better than Euler!)
 	def propagate(self, state, f, dt):
 		state += dt * self.rates(state, f)
+
+		q = state[6:10]
+		q /= np.linalg.norm(q)
+		state[6:10] = q
 		return state
 	
 	def propagateRK4(self, state, f, dt):
+		# Double-Checked
 		"""
 		RK4 integration step for a system defined by self.rates(state, f)
 		
@@ -85,11 +92,16 @@ class dynamics:
 		Returns:
 			np.array : The updated state after one RK4 step
 		"""
+		h = dt;
+
 		k1 = self.rates(state, f)
-		k2 = self.rates(state + 0.5 * dt * k1, f)
-		k3 = self.rates(state + 0.5 * dt * k2, f)
-		k4 = self.rates(state + dt * k3, f)
+		k2 = self.rates(state + (h/2) * k1, f)
+		k3 = self.rates(state + (h/2) * k2, f)
+		k4 = self.rates(state + (h) * k3, f)
 
-		state += (dt / 6.0) * (k1 + 2*k2 + 2*k3 + k4)
+		state += (h / 6.0) * (k1 + 2*k2 + 2*k3 + k4)
+
+		q = state[6:10]
+		q /= np.linalg.norm(q)
+		state[6:10] = q
 		return state
-

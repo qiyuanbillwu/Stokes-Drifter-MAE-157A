@@ -26,8 +26,8 @@ dt = 0.01
 
 # boundary points and conditions
 x0, y0, z0 = 1, -1, 1
-x1, y1, z1 = -1.5, 0, 2.5
-x2, y2, z2 = 1, 1, 1
+x1, y1, z1 = 1, -1, 1
+x2, y2, z2 = 1, -1, 1
 vy = 4.0
 T = 5
 
@@ -202,8 +202,8 @@ def get_state_simple(t):
     # boundary points and conditions
 
     # moving along the x axis
-    # x0, y0, z0 = -1, 0, 1
-    # x2, y2, z2 = 1, 0, 1 
+    #x0, y0, z0 = -1, 0, 1
+    #x2, y2, z2 = 1, 0, 1 
 
     # moving along the y axis
     # x0, y0, z0 = 0, -1, 1
@@ -263,7 +263,7 @@ def get_state_simple(t):
         "s": s,         # snap
         "f": f          # forces
         }
-        # print(state)
+        #print(state)
 
         return state
 
@@ -346,7 +346,4 @@ def get_state_simple(t):
     "s": s,         # snap
     "f": f          # forces
     }
-    # print("state (traj): ", state)
-    # print("state (traj): ", np.concatenate([state['r'], state['v'], state['q'], state['w']]))
-    return state
 
