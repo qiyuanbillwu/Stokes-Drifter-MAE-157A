@@ -1,0 +1,7 @@
+*.csv
+
+drone_simulator_basic/drone_simulator_basic/scripts/__pycache__/
+
+*.DS_Store
+
+*.pyc
