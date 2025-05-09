@@ -347,3 +347,5 @@ def get_state_simple(t):
     "f": f          # forces
     }
 
+    return state
+
