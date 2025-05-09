@@ -43,7 +43,7 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError):
     first_part = (1 / (np.sqrt(2*(1 + e3_hat.T @ a_hat)))) * (1 + e3_hat.T @ a_hat)
 
     q_des = np.array([first_part, cross_part[0], cross_part[1], cross_part[2]])
-    print("q_des: ", q_des)
+    # print("q_des: ", q_des)
 
     R_d = quat_to_rot(q_des)
 
@@ -74,9 +74,10 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     # this should be q_des conjugate, but somehow q_des works better
     # q_e = quaternion_error(quat_conjugate(q_des), q_curr)
     q_e = quaternion_error(q_des, q_curr)
+    # print("q_e: ", q_e)
 
     # PD gains
-    Kp = np.array([1.0, 1.0, 0.5])
+    Kp = np.array([0.5, 0.5, 0.5])
     Kd = np.array([0.3, 0.3, 0.3])   
 
     Lambda = np.array([0.5, 0.5, 0.3])
@@ -99,8 +100,10 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
 
     # Combine total thrust and torques
     tau_full = np.array([T, *tau])
+    # print("tau_full (control): ", tau_full)
 
     # Solve for motor forces
     f = np.linalg.solve(mix, tau_full)
+    # print("f (control): ", f)
 
     return f
