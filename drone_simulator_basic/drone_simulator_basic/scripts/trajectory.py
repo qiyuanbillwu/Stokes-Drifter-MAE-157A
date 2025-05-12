@@ -28,10 +28,10 @@ m = 0.5
 dt = 0.01
 
 # boundary points and conditions
-x0, y0, z0 = 0, -2, 2
-x1, y1, z1 = 0, 0, 2
-x2, y2, z2 = 0, 2, 2
-vy = 4.0
+x0, y0, z0 = 1, -2, 1
+x1, y1, z1 = -1, 0, 2
+x2, y2, z2 = 1, 2, 1
+vy = 3.0
 T = 5
 theta = 45 * np.pi / 180 # angle of the gate
 
