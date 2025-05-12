@@ -2,7 +2,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
-from util import angular_velocity_body_wxyz
 
 # Update with actual file name in the data director
 file_name = "data/data_2025-05-11_22-28-15.csv"
@@ -18,7 +17,6 @@ t = data[:, 0]
 x = data[:, 1]
 y = data[:, 2]
 z = data[:, 3]
-
 vx = data[:, 4]
 vy = data[:, 5]
 vz = data[:, 6]
@@ -33,15 +31,6 @@ f1 = data[:, 14]
 f2 = data[:, 15]
 f3 = data[:, 16]
 f4 = data[:, 17]
-
-qw_d = data[:, 18]
-qx_d = data[:, 19]
-qy_d = data[:, 20]
-qz_d = data[:, 21]
-
-wx_d = data[:, 22]
-wy_d = data[:, 23]
-wz_d = data[:, 24]
 
 # initialize empty arrays
 xd, yd, zd = [], [], []
@@ -76,12 +65,12 @@ vzdes = np.array(vzdes)
 
 # --- Position vs Time ---
 plt.figure(1)
-plt.plot(t, x, label='x', color="red")
-plt.plot(t, y, label='y', color="blue")
-plt.plot(t, z, label='z', color="green")
-plt.plot(t, xd, label='xd', linestyle='--', color="red")
-plt.plot(t, yd, label='yd', linestyle='--', color="blue")
-plt.plot(t, zd, label='zd', linestyle='--', color="green")
+plt.plot(t, x, label='x')
+plt.plot(t, y, label='y')
+plt.plot(t, z, label='z')
+plt.plot(t, xd, label='xd', linestyle='--')
+plt.plot(t, yd, label='yd', linestyle='--')
+plt.plot(t, zd, label='zd', linestyle='--')
 plt.xlabel('Time [s]')
 plt.ylabel('Position [m]')
 plt.title('Position vs Time')
@@ -123,6 +112,7 @@ plt.plot(t, equForce, label="Hovering Force [N]");
 plt.legend();
 
 # Legend
+
 # --- 3D Drone Trajectory ---
 fig = plt.figure(2)
 ax = fig.add_subplot(111, projection='3d')
@@ -152,6 +142,7 @@ plt.title('Velocity vs Time')
 plt.legend()
 plt.grid()
 
+
 print("Final Actual Position:   x = {:.3f}, y = {:.3f}, z = {:.3f}".format(x[-1], y[-1], z[-1]))
 print("Final Desired Position:  xd = {:.3f}, yd = {:.3f}, zd = {:.3f}".format(xd[-1], yd[-1], zd[-1]))
 
@@ -164,9 +155,9 @@ plt.plot(t, qy, color="blue")
 plt.plot(t, qz, color="green")
 
 #plt.plot(t, qw_d, color="purple", linestyle="--")
-plt.plot(t, qx_d, color="red", linestyle="--")
-plt.plot(t, qy_d, color="blue", linestyle="--")
-plt.plot(t, qz_d, color="green", linestyle="--")
+plt.plot(t, qxdes, color="red", linestyle="--")
+plt.plot(t, qydes, color="blue", linestyle="--")
+plt.plot(t, qzdes, color="green", linestyle="--")
 
 # -- Performance of Outer + Inner Controller --
 
@@ -174,29 +165,12 @@ wx_d_calc = np.zeros(len(t))
 wy_d_calc = np.zeros(len(t))
 wz_d_calc = np.zeros(len(t))
 
-dt = (t[3] - t[2]);
-
-print(dt)
-for i in range(0,len(t)-1):
-    qd2 = np.array([qw_d[i], qx_d[i], qy_d[i], qz_d[i]]);
-    qd1 = np.array([qw_d[i+1], qx_d[i+1], qy_d[i+1], qz_d[i+1]]);
-    wx_d_calc[i+1], wy_d_calc[i+1], wz_d_calc[i+1] = angular_velocity_body_wxyz(qd1, qd2, dt)
-
 wx_d_calc[1] = 0;
 wy_d_calc[1] = 0;
 wz_d_calc[1] = 0;
 
-#plt.plot(t, wx_d_calc, color="red", linestyle=":")
-#plt.plot(t, wy_d_calc, color="blue", linestyle=":")
-#plt.plot(t, wz_d_calc, color="green", linestyle=":")
-
-plt.plot(t, wx_d, color="red", linestyle="--")
-plt.plot(t, wy_d, color="blue", linestyle="--")
-plt.plot(t, wz_d, color="green", linestyle="--")
-
-#plt.figure(104)
-#plt.plot(t, wx_d_calc/wx_d);
-#plt.plot(t, wy_d_calc/wy_d);
-#plt.plot(t, wz_d_calc/wz_d);
+plt.plot(t, wx_d_calc, color="red", linestyle=":")
+plt.plot(t, wy_d_calc, color="blue", linestyle=":")
+plt.plot(t, wz_d_calc, color="green", linestyle=":")
 
 plt.show()

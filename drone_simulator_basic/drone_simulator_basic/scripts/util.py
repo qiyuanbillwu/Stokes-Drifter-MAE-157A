@@ -136,16 +136,16 @@ def allocation_matrix(l,d):
 #     [d, -d, d, -d]       # Yaw
 #     ])
 
-# def quat_multiply(q1, q2):
-#     # Hamilton product of two quaternions
-#     w1, x1, y1, z1 = q1
-#     w2, x2, y2, z2 = q2
-#     return np.array([
-#         w1*w2 - x1*x2 - y1*y2 - z1*z2,
-#         w1*x2 + x1*w2 + y1*z2 - z1*y2,
-#         w1*y2 - x1*z2 + y1*w2 + z1*x2,
-#         w1*z2 + x1*y2 - y1*x2 + z1*w2
-#     ])
+def quat_multiply(q1, q2):
+    # Hamilton product of two quaternions
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    return np.array([
+        w1*w2 - x1*x2 - y1*y2 - z1*z2,
+        w1*x2 + x1*w2 + y1*z2 - z1*y2,
+        w1*y2 - x1*z2 + y1*w2 + z1*x2,
+        w1*z2 + x1*y2 - y1*x2 + z1*w2
+    ])
 
 def quat_conjugate(q):
     w, x, y, z = q
@@ -156,18 +156,33 @@ def qdot_from_omega(q, omega):
     omega_quat = np.array([0, *omega])
     return 0.5 * quat_multiply(q, omega_quat)
 
-def quat_multiply(q, r):
+import numpy as np
+
+def euler_to_quaternion(roll, pitch, yaw):
     """
-    Hamilton product q ⊗ r for quaternions in (w, x, y, z) format.
+    Convert Euler angles to quaternion.
+    
+    Args:
+        roll: Rotation around X-axis (in radians)
+        pitch: Rotation around Y-axis (in radians)
+        yaw: Rotation around Z-axis (in radians)
+    
+    Returns:
+        A tuple (w, x, y, z) representing the quaternion.
     """
-    w1, x1, y1, z1 = q
-    w2, x2, y2, z2 = r
-    return np.array([
-        w1*w2 - x1*x2 - y1*y2 - z1*z2,
-        w1*x2 + x1*w2 + y1*z2 - z1*y2,
-        w1*y2 - x1*z2 + y1*w2 + z1*x2,
-        w1*z2 + x1*y2 - y1*x2 + z1*w2
-    ])
+    cy = np.cos(yaw * 0.5)
+    sy = np.sin(yaw * 0.5)
+    cp = np.cos(pitch * 0.5)
+    sp = np.sin(pitch * 0.5)
+    cr = np.cos(roll * 0.5)
+    sr = np.sin(roll * 0.5)
+
+    w = cr * cp * cy + sr * sp * sy
+    x = sr * cp * cy - cr * sp * sy
+    y = cr * sp * cy + sr * cp * sy
+    z = cr * cp * sy - sr * sp * cy
+
+    return (w, x, y, z)
 
 import numpy as np
 
@@ -246,4 +261,3 @@ def noise_ify(idealValue, mu, sigma):
     #mu, sigma = 0, 0.1 # example mean and standard deviation
     s = np.random.normal(mu, sigma, 1)
     return idealValue * (1 + s);
-

@@ -8,7 +8,6 @@
 import numpy as np
 import datetime
 import os
-import matplotlib.pyplot as plt
 
 print("Current Working Directory:", os.getcwd())
 
@@ -16,13 +15,12 @@ print("Current Working Directory:", os.getcwd())
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
 from trajectory import get_state, get_state_simple
-from constants import g, m, l, Cd, Cl, J
 
 ##########################################
 ############ Drone Simulation ############
 ##########################################
 
-# Save Data Flag
+# Save data flag
 save_data = True
 
 # Initial conditions
@@ -70,16 +68,16 @@ tf = 2
 rate = 500
 dt = 1./rate
 
-# # Gravity
-# g = 9.81
+# Gravity
+g = 9.81
 
-# # Other parameters?
-# #placeholder for now
-# m = 0.7437  # mass of drone [kg]
-# l = 0.115   # meters [m]
-# Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
-# Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
-# J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
+# Other parameters?
+#placeholder for now
+m = 0.7437  # mass of drone [kg]
+l = 0.115   # meters [m]
+Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
+Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
+J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
 
 # Initialize dynamics
 dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
@@ -87,17 +85,8 @@ dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 # Initialize data array that contains useful info (probably should add more)
 data = np.append(t,state)
 data = np.append(data,f)
-data = np.append(data,[1,0,0,0])
-data = np.append(data,[0,0,0])
 
 lastVelError = 0
-prev_filtered_derivative = 0
-
-q_actual_log = []
-q_desired_log = []
-q_state_log = []
-time_log = []
-
 # Simulation loop
 running = True
 while running:
@@ -110,28 +99,17 @@ while running:
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
-    T, q_des, omega_des, lastVelError, prev_filtered_derivative = outer_loop_controller(state, trajectory, m, g, dt, lastVelError, prev_filtered_derivative)
+    T, q_des, omega_des, lastVelError = outer_loop_controller(state, trajectory, m, g, dt, lastVelError)
 
-    # Run inner-loop controller to get motor forces
+    # Run inner-loop controller to get motor forces 
     # Inner-loop controller
-
-    q_actual = np.array(trajectory['q'])
-    q_desired = np.array(q_des)
-    q_state = np.array(state[6:10])
-
-    q_state_log.append(q_state)
-    q_actual_log.append(q_actual)
-    q_desired_log.append(q_desired)
-    time_log.append(t)
-        
+    
     f = inner_loop_controller(state, q_des, omega_des, T, l, dyn.d)
 
     # Propagate dynamics with control inputs
     #print(state.shape)
     #print(f.shape)
-    # state = dyn.propagate(state, f, dt)
-    state = dyn.propagateRK4(state, f, dt)
-    # print("state (dynamics): ", state)
+    state = dyn.propagate(state, f, dt)
  
     # If z to low then indicate crash and end simulation
     if state[2] < 0.1:
@@ -141,15 +119,15 @@ while running:
     # Update data array (this can probably be done in a much cleaner way...)
     tmp = np.append(t,state)
     tmp = np.append(tmp,f)
-    tmp = np.append(tmp,q_des)
-    tmp = np.append(tmp,omega_des)
+    #tmp = np.append(tmp,q_des)
+    #tmp = np.append(tmp,omega_des)
     data = np.vstack((data,tmp))
 
     # Update time
     t += dt 
 
     # If time exceeds final time then stop simulator
-    # print(t)
+    print(t)
     if t >= tf:
         running = False
 
@@ -167,31 +145,3 @@ if save_data:
     print("Saving to:", file_path)
 
     np.savetxt("../data/"+file_name, data, delimiter=",")
-
-
-q_actual_log = np.array(q_actual_log)
-q_desired_log = np.array(q_desired_log)
-q_state_log = np.array(q_state_log)
-time_log = np.array(time_log)
-
-labels = ['q0', 'q1', 'q2', 'q3']
-
-plt.figure(figsize=(12, 8))
-for i in range(4):
-    plt.subplot(2, 2, i + 1)
-    plt.plot(time_log, q_actual_log[:, i], label='Trajectory')
-    plt.plot(time_log, q_desired_log[:, i], '--', label='Desired')
-    plt.plot(time_log, q_state_log[:, i], '--', label='State')
-    plt.title(f'Quaternion {labels[i]}')
-    plt.xlabel('Time [s]')
-    plt.ylabel('Value')
-    plt.legend()
-    plt.grid(True)
-
-plt.tight_layout()
-plt.show()
-
-qw = data[:, 7]
-qx = data[:, 8]
-qy = data[:, 9]
-qz = data[:, 10]
