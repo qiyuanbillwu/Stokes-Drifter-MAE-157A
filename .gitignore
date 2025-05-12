@@ -1,12 +1,13 @@
 *.csv
-
-drone_simulator_basic/drone_simulator_basic/scripts/__pycache__/
-
 *.DS_Store
-
 *.pyc
 
+drone_simulator_basic/drone_simulator_basic/scripts/__pycache__/
+__pycache__/
 code/trajectory.m
 code/trajectory2.m
 drone_simulator_basic/drone_simulator_basic/scripts/test_bill.py
 drone_simulator_basic/drone_simulator_basic/scripts/test.py
+
+
+drone_simulator_basic/drone_simulator_basic/scripts/__pycache__/constants.cpython-312.pyc
