@@ -5,7 +5,7 @@ from trajectory import get_state, get_state_simple
 from util import angular_velocity_body_wxyz
 
 # Update with actual file name in the data director
-file_name = "data\data_2025-05-08_11-31-06.csv"
+file_name = "data/data_2025-05-11_22-28-15.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
@@ -50,7 +50,8 @@ qwdes,qxdes,qydes,qzdes = [], [], [], []
 wxdes, wydes, wzdes = [], [], []
 
 for ti in t:
-    traj = get_state_simple(ti)
+    # traj = get_state_simple(ti)
+    traj = get_state(ti)
     xd.append(traj['r'][0])
     yd.append(traj['r'][1])
     zd.append(traj['r'][2])
