@@ -34,9 +34,9 @@ f = np.zeros(4)
 
 #assuming start from 1,1,1
 
-state[0] = 1
-state[1] = 1
-state[2] = 1   
+state[0] = 0
+state[1] = -2
+state[2] = 2 
 
 # vx, vy, vz
 # Zero Velocity
@@ -62,7 +62,7 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 3.0
+tf = 2
 
 # Simulation rate
 rate = 500
@@ -93,7 +93,9 @@ while running:
     # Get new desired state from trajectory planner
     # xd, yd, zd, ... = get_desired_state(t)
 
-    trajectory = get_state_simple(t)
+
+    # trajectory = get_state_simple(t) # for simple trajectories between 2 points
+    trajectory = get_state(t)
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
