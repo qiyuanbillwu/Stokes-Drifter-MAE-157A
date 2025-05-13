@@ -5,7 +5,7 @@ from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
 
-file_name = "data\data_2025-05-08_11-40-28.csv"
+file_name = "data\data_2025-05-13_10-22-59.csv"
 
 
 # Load in data as giant matrix
