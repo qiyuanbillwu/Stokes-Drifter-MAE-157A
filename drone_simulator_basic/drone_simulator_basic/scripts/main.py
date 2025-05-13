@@ -96,9 +96,9 @@ while running:
     trajectory = get_state(t)
 
     # 5 cm positional error, 5% other error
-    posErr = 0.05 #m
-    otherErr_percentage = 0.05; #5%
-    percievedState = addNoiseToPercievedState(state, 0.05, 0.05)
+    posErr = 0.15 #m
+    otherErr_percentage = 0.15; # 15%
+    percievedState = addNoiseToPercievedState(state, posErr, otherErr_percentage)
 
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller

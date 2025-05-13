@@ -322,6 +322,6 @@ def addNoiseToPercievedState(state, stdNoisePos, percNoiseOther):
     nOther[3:7] = normalize_quaternion_wxyz(nQ)
 
     nState = np.append(nPos, nOther);
-    print(nState)
+    #print(nState)
 
     return nState;
