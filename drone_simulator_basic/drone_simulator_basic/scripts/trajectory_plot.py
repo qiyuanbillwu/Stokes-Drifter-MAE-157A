@@ -13,7 +13,7 @@ wdot = []
 forces = []
 
 t0 = 0
-t2 = 2
+t2 = 4
 dt = 0.01
 
 ts = np.arange(t0, t2, dt)

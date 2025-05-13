@@ -34,9 +34,9 @@ f = np.zeros(4)
 
 #assuming start from 1,1,1
 
-state[0] = 1
-state[1] = -2
-state[2] = 1 
+initial_state = get_state(0.0)
+
+state[0:3] = initial_state['r']
 
 # vx, vy, vz
 # Zero Velocity
@@ -62,7 +62,7 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 2
+tf = 4
 
 # Simulation rate
 rate = 500

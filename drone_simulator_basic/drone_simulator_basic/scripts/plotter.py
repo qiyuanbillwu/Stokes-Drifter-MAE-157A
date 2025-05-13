@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-file_name = "data/data_2025-05-11_22-28-15.csv"
+file_name = "data/data_2025-05-13_09-45-53.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
@@ -147,17 +147,17 @@ print("Final Actual Position:   x = {:.3f}, y = {:.3f}, z = {:.3f}".format(x[-1]
 print("Final Desired Position:  xd = {:.3f}, yd = {:.3f}, zd = {:.3f}".format(xd[-1], yd[-1], zd[-1]))
 
 # -- Performance of Outer + Inner Controller --
-plt.figure(102)
+plt.figure(4)
 plt.title("Desired vs Actual Orientation")
 #plt.plot(t, qw, color="purple")
-plt.plot(t, qx, color="red")
-plt.plot(t, qy, color="blue")
-plt.plot(t, qz, color="green")
+plt.plot(t, qx, color="red", label='qx')
+plt.plot(t, qy, color="blue", label='qy')
+plt.plot(t, qz, color="green", label='qz')
 
 #plt.plot(t, qw_d, color="purple", linestyle="--")
-plt.plot(t, qxdes, color="red", linestyle="--")
-plt.plot(t, qydes, color="blue", linestyle="--")
-plt.plot(t, qzdes, color="green", linestyle="--")
+plt.plot(t, qxdes, color="red", linestyle="--", label='qx_des')
+plt.plot(t, qydes, color="blue", linestyle="--", label='qy_des')
+plt.plot(t, qzdes, color="green", linestyle="--", label='qz_des')
 
 # -- Performance of Outer + Inner Controller --
 
@@ -169,8 +169,8 @@ wx_d_calc[1] = 0;
 wy_d_calc[1] = 0;
 wz_d_calc[1] = 0;
 
-plt.plot(t, wx_d_calc, color="red", linestyle=":")
-plt.plot(t, wy_d_calc, color="blue", linestyle=":")
-plt.plot(t, wz_d_calc, color="green", linestyle=":")
+plt.plot(t, wx_d_calc, color="red", linestyle=":", label = 'wx_d_calc')
+plt.plot(t, wy_d_calc, color="blue", linestyle=":", label = 'wx_d_calc')
+plt.plot(t, wz_d_calc, color="green", linestyle=":", label = 'wx_d_calc')
 
 plt.show()
