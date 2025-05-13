@@ -28,13 +28,14 @@ m = 0.5
 dt = 0.01
 
 # boundary points and conditions
-x0, y0, z0 = 1, -1, 1
-x1, y1, z1 = 1, -1, 1
-x2, y2, z2 = 1, -1, 1
-vy = 4.0
+x0, y0, z0 = 1.2, -1.8, 1
+x1, y1, z1 = -1.2, 0, 2
+x2, y2, z2 = 1.2, 1.8, 1
+vy = 2.0
 T = 5
+theta = 45 * np.pi / 180 # angle of the gate
 
-t0, t1, t2 = 0, 1.5, 3
+t0, t1, t2 = 0, 2, 4
 
 r0 = np.array([x0, y0, z0])
 v0 = np.array([0, 0, 0])
@@ -42,7 +43,7 @@ a0 = np.array([0, 0, 0])
 j0 = np.array([0, 0, 0])
 r1 = np.array([x1, y1, z1])
 v1 = np.array([0, vy, 0])
-a1 = np.array([T/m, 0, -g])
+a1 = np.array([T*np.cos(theta)/m, 0, T*np.sin(theta)/m-g])
 j1 = np.array([0, 0, 0])
 r2 = np.array([x2, y2, z2])
 v2, a2, j2 = v0, a0, j0
