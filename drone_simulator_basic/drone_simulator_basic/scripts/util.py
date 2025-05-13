@@ -276,7 +276,52 @@ def angular_velocity_body_wxyz(q1_wxyz, q2_wxyz, dt):
 
     return omega_body
 
-def noise_ify(idealValue, mu, sigma):
+import numpy as np
+
+def normalize_quaternion_wxyz(q):
+    """
+    Normalize a quaternion in (w, x, y, z) format.
+
+    Args:
+        q : array-like of shape (4,) -- quaternion [w, x, y, z]
+
+    Returns:
+        np.array of shape (4,) -- normalized quaternion [w, x, y, z]
+    """
+    q = np.asarray(q, dtype=np.float64)
+    norm_q = np.linalg.norm(q)
+
+    if norm_q < 1e-8:
+        raise ValueError("Cannot normalize a zero-magnitude quaternion")
+
+    return q / norm_q
+
+def noise_percent(idealValue, mu, sigma):
     #mu, sigma = 0, 0.1 # example mean and standard deviation
     s = np.random.normal(mu, sigma, 1)
     return idealValue * (1 + s);
+
+def noise_offset(idealValue, mu, sigma):
+    #mu, sigma = 0, 0.1 # example mean and standard deviation
+    s = np.random.normal(mu, sigma, 1)
+    return idealValue * s;
+
+# Summary of States Array
+# state = [posX, posY, posZ, velX, velY, velZ, qw, qx, qy, qz, wx, wy, wz]
+# index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
+
+def addNoiseToPercievedState(state, stdNoisePos, percNoiseOther):
+    pos = state[0:3]
+    nPos = noise_percent(pos,0,stdNoisePos)
+
+    other = state[3:13]
+    nOther = noise_percent(other,0,percNoiseOther)
+
+    # Normalize Unit Quaternion
+    nQ = nOther[3:7];
+    nOther[3:7] = normalize_quaternion_wxyz(nQ)
+
+    nState = np.append(nPos, nOther);
+    print(nState)
+
+    return nState;

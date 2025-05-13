@@ -62,8 +62,6 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
 
     a_dot = trajectory['j'] - Kp * e_vel - Kd * filtered_derivative
 
-    
-
     lastVelError = e_vel
 
     adot_hat = get_a_dot_hat(a, a_dot)

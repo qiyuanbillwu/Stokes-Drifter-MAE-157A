@@ -15,6 +15,7 @@ print("Current Working Directory:", os.getcwd())
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
 from trajectory import get_state, get_state_simple
+from util import addNoiseToPercievedState;
 
 ##########################################
 ############ Drone Simulation ############
@@ -72,13 +73,8 @@ dt = 1./rate
 # Gravity
 g = 9.81
 
-# Other parameters?
-#placeholder for now
-m = 0.7437  # mass of drone [kg]
-l = 0.115   # meters [m]
-Cd = 0.01   # drag coefficient of propellers [PLACEHOLDER]
-Cl = 0.1    # lift coefficent of propellers  [PLACEHOLDER]
-J = np.diag([0.00225577, 0.00360365, 0.00181890]) # [kg/m2]
+# Import Values from constants.py
+from constants import g, m, l, Cd, Cl, d, J
 
 # Initialize dynamics
 dyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
@@ -99,14 +95,18 @@ while running:
     # trajectory = get_state_simple(t) # for simple trajectories between 2 points
     trajectory = get_state(t)
 
+    # 5 cm positional error, 5% other error
+    posErr = 0.05 #m
+    otherErr_percentage = 0.05; #5%
+    percievedState = addNoiseToPercievedState(state, 0.05, 0.05)
+
     # Run outer-loop controller to get thrust and references for inner loop 
     # Outer-loop controller
-    T, q_des, omega_des, lastVelError, prev_filtered_derivative = outer_loop_controller(state, trajectory, m, g, dt, lastVelError, prev_filtered_derivative)
+    T, q_des, omega_des, lastVelError, prev_filtered_derivative = outer_loop_controller(percievedState, trajectory, m, g, dt, lastVelError, prev_filtered_derivative)
 
     # Run inner-loop controller to get motor forces 
     # Inner-loop controller
-    
-    f = inner_loop_controller(state, q_des, omega_des, T, l, dyn.d)
+    f = inner_loop_controller(percievedState, q_des, omega_des, T, l, dyn.d)
 
     # Propagate dynamics with control inputs
     #print(state.shape)
