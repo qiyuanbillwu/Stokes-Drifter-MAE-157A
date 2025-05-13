@@ -4,6 +4,16 @@ import numpy as np
 def get_a_dot_hat(a, adot):
     if np.linalg.norm(a) == 0:
         print("Error: a is 0!")
+        print("Error: a is 0!")
+        print("Error: a is 0!")
+        print("Error: a is 0!")
+        print("Error: a is 0!")
+        print("Error: a is 0!")
+        print("Error: a is 0!")
+        print("Error: a is 0!")
+        print("Error: a is 0!")
+        print("Error: a is 0!")
+
     return adot / np.linalg.norm(a) - a * (a.T @ adot) / np.linalg.norm(a)**3
 
 # Helper function that converts a quaternion to rotation matrix
@@ -111,6 +121,15 @@ def allocation_matrix(l,d):
     [l, -l, -l, l],      # Pitch
     [-d, d, -d, d]       # Yaw
     ])
+    
+    #try this 
+    # return np.array([
+    # [1, 1, 1, 1],        # Total thrust
+    # [l, l, -l, -l],      # Roll
+    # [-l, l, l, -l],      # Pitch
+    # [d, -d, d, -d]       # Yaw
+    # ])
+    
 
 # ==============================================
 # alternative allocation matrix

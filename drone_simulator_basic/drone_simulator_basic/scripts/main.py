@@ -20,6 +20,7 @@ from trajectory import get_state, get_state_simple
 ############ Drone Simulation ############
 ##########################################
 
+
 # Save data flag
 save_data = True
 
@@ -128,7 +129,7 @@ while running:
     t += dt 
 
     # If time exceeds final time then stop simulator
-    print(t)
+    #print(t)
     if t >= tf:
         running = False
 
