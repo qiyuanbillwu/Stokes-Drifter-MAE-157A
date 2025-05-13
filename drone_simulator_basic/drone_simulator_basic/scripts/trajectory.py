@@ -27,15 +27,30 @@ g = 9.81
 m = 0.5
 dt = 0.01
 
-# boundary points and conditions
-x0, y0, z0 = 1.2, -1.8, 1
-x1, y1, z1 = -1.2, 0, 2
-x2, y2, z2 = 1.2, 1.8, 1
-vy = 2.0
-T = 5
-theta = 45 * np.pi / 180 # angle of the gate
+# theta is the angle between the thrust vector and horizontal
+# theta = 0 means a 90 degree gate
 
-t0, t1, t2 = 0, 2, 4
+# ===== 45 degree =====
+# boundary points and conditions
+# x0, y0, z0 = 1.2, -1.8, 1
+# x1, y1, z1 = -1.2, 0, 2
+# x2, y2, z2 = 1.2, 1.8, 1
+# vy = 2.0
+# T = 5
+# theta = 45 * np.pi / 180 # angle of the gate
+
+# t0, t1, t2 = 0, 2, 4
+
+# ===== 90 degree =====
+# boundary points and conditions
+x0, y0, z0 = 1.5, -1.5, 1
+x1, y1, z1 = -1.5, 0, 3
+x2, y2, z2 = 1.5, 1.5, 1
+vy = 3
+T = 6
+theta = 0 * np.pi / 180 # angle of the gate
+
+t0, t1, t2 = 0, 1.5, 3
 
 r0 = np.array([x0, y0, z0])
 v0 = np.array([0, 0, 0])
