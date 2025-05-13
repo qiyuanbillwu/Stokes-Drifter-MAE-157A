@@ -22,7 +22,7 @@ from trajectory import get_state, get_state_simple
 ##########################################
 
 # Save Data Flag
-save_data = True
+save_data = False
 
 # Initial conditions
 t = 0.0
@@ -144,7 +144,7 @@ while running:
     t += dt 
 
     # If time exceeds final time then stop simulator
-    print(t)
+    #print(t)
     if t >= tf:
         running = False
 

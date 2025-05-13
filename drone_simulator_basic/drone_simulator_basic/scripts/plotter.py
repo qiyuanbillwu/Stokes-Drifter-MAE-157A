@@ -5,7 +5,7 @@ from trajectory import get_state, get_state_simple
 from util import angular_velocity_body_wxyz
 
 # Update with actual file name in the data director
-file_name = "data\data_2025-05-08_11-31-06.csv"
+file_name = "data\data_2025-05-08_11-40-28.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
@@ -107,19 +107,19 @@ plt.ylim(-0.25,0.25)
 
 
 # -- Motor Forces vs. Time --
-plt.figure(101)
-plt.plot(t, f1, label="f1 [N]");
-plt.plot(t, f2, label="f2 [N]");
-plt.plot(t, f3, label="f3 [N]");
-plt.plot(t, f4, label="f4 [N]");
-plt.title("Motor Forces")
-plt.xlabel("Force [N]");
-plt.ylabel("Time [s]");
+# plt.figure(101)
+# plt.plot(t, f1, label="f1 [N]");
+# plt.plot(t, f2, label="f2 [N]");
+# plt.plot(t, f3, label="f3 [N]");
+# plt.plot(t, f4, label="f4 [N]");
+# plt.title("Motor Forces")
+# plt.xlabel("Force [N]");
+# plt.ylabel("Time [s]");
 
-equForce = np.ones(len(t)) * (m*g / 4);
-plt.plot(t, equForce, label="Hovering Force [N]");
+# equForce = np.ones(len(t)) * (m*g / 4);
+# plt.plot(t, equForce, label="Hovering Force [N]");
 
-plt.legend();
+# plt.legend();
 
 # Legend
 # --- 3D Drone Trajectory ---
