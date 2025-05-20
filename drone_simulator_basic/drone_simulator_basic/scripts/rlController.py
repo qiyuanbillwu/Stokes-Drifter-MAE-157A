@@ -24,7 +24,7 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
 
     # PID gains for position control
     Kp = np.array([0.4, 0.4, 0.4])  # Adjust these gains as necessary
-    Kd = np.array([0.2, 0.2, 0.2])  # Adjust these gains as necessary
+    Kd = np.array([0.05, 0.05, 0.05])  # Adjust these gains as necessary
 
     accel_des = np.array([axdes, aydes, azdes])
 
@@ -49,13 +49,11 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     R_d = quat_to_rot(q_des)
 
     # =============
-    # how to apply a low-pass filter?
-
-    raw_derivative = (e_vel - lastVelError) / dt
-
-    alpha = 0.2
+    # Acceleration Tracking
+    raw_derivative = (e_vel - lastVelError) / dt # Error in acceleration over a single timestep
 
     # Apply low-pass filter to derivative only
+    alpha = 0.2
     filtered_derivative = alpha * prev_filtered_derivative + (1 - alpha) * raw_derivative
 
     prev_filtered_derivative = filtered_derivative
@@ -65,13 +63,6 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     lastVelError = e_vel
 
     adot_hat = get_a_dot_hat(a, a_dot)
-
-    # omega is in the form of (wy, -wx, 0)
-    # want omega_des in the form (wx, wy, 0)
-    #omega = R_d.T @ adot_hat
-    #omega_des = omega
-    #omega_des[0] = -omega[1]
-    #omega_des[1] = omega[0]
 
     omega_des = np.cross(a_hat, adot_hat)
     omega_des[2] = 0  # if yaw is not tracked

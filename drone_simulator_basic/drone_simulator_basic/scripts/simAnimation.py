@@ -30,6 +30,7 @@ for i in range(0,len(ahat)):
 
 # Desired Trajectory
 desiredPos = np.array([get_state(t)['r'] for t in ts])
+adhat = np.array([get_state(t)['adhat'] for t in ts])
 
 # Setup Figure
 fig = plt.figure(figsize=(10, 8))
@@ -67,8 +68,9 @@ rect = Poly3DCollection([rect_verts], alpha=0.3, facecolor='green', edgecolor='k
 ax.add_collection3d(rect)
 
 # Animation elements
-line, = ax.plot([], [], [], 'b', label='Trajectory')
-quiver = ax.quiver([], [], [], [], [], [], length=0.5, color='r', label='Thrust')
+line, = ax.plot([], [], [], 'b', label='Actual Trajectory')
+quiver = ax.quiver([], [], [], [], [], [], length=0.5, color='black', label='Thrust')
+quiverDes = ax.quiver([], [], [], [], [], [], length=0.5, color='r', label='Desired Thrust')
 point = ax.plot([], [], [], 'ko', markersize=8)[0]
 time_text = ax.text2D(0.02, 0.95, '', transform=ax.transAxes)
 
@@ -82,6 +84,7 @@ def init():
     line.set_data([], [])
     line.set_3d_properties([])
     quiver.set_segments([])
+    quiverDes.set_segments([])
     point.set_data([], [])
     point.set_3d_properties([])
     time_text.set_text('')
@@ -99,11 +102,20 @@ def update(frame):
         
         quiver.set_segments([[p, p + 0.4*ahat[frame-1]]])
         time_text.set_text(f'Time: {ts[frame-1]:.2f}s')
+
+        pDes = desiredPos[frame-1]
+        quiverDes.set_segments([[pDes, pDes + 0.4*adhat[frame-1]]])
     return line, quiver, point, time_text
 
 # Run animation
-fps = 1000
+fps = 60
 ani = FuncAnimation(fig, update, frames=len(ts), init_func=init,
                    interval=1000/fps, blit=False)
-ani.save("../data/simulated 90 degree animation.gif", writer='ffmpeg', fps=fps)
+
+ani.save("../data/simulated_90deg_animation.mp4",
+         writer='ffmpeg',
+         fps=fps,
+         #extra_args=['-vcodec', 'libx264']
+)
+
 plt.show()
