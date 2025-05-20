@@ -32,22 +32,22 @@ dt = 0.01
 
 # ===== 45 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1.2, -1.8, 1
-# x1, y1, z1 = -1.2, 0, 2
-# x2, y2, z2 = 1.2, 1.8, 1
-# vy = 2.0
-# T = 5
+# x0, y0, z0 = 1, -1, 0.5
+# x1, y1, z1 = -1, 0, 1.5
+# x2, y2, z2 = 1, 1, 0.5
+# vy = 3.0
+# T = 10 # enough thrust to cancel out gravity at gate
 # theta = 45 * np.pi / 180 # angle of the gate
 
 # t0, t1, t2 = 0, 2, 4
 
 # ===== 90 degree =====
 # boundary points and conditions
-x0, y0, z0 = 1.5, -1.5, 1
-x1, y1, z1 = -1.5, 0, 3
-x2, y2, z2 = 1.5, 1.5, 1
+x0, y0, z0 = 1, -1, 0.5
+x1, y1, z1 = -1, 0, 2
+x2, y2, z2 = 1, 1, 0.5
 vy = 3
-T = 6
+T = 3
 theta = 0 * np.pi / 180 # angle of the gate
 
 t0, t1, t2 = 0, 1.5, 3
@@ -96,6 +96,7 @@ def get_state(t):
         wdot = v0
 
         a_d = a + np.array([0 ,0, g])
+        a_d_hat = a_d / np.linalg.norm(a_d)
         tau = J @ wdot + np.cross(w, J@w)
         # print("tau: ", tau)
 
@@ -117,7 +118,8 @@ def get_state(t):
         "a": a,         # acceleration
         "j": j,         # jerk
         "s": s,         # snap
-        "f": f          # forces
+        "f": f,          # forces
+        'adhat': a_d_hat
         }
         # print(state)
 
@@ -208,7 +210,8 @@ def get_state(t):
         "a": a,         # acceleration
         "j": j,         # jerk
         "s": s,          # snap
-        "f": f          # force
+        "f": f,          # force
+        "adhat": a_d_hat
     }
     # print(state)
 
