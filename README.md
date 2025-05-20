@@ -1,1 +1,1 @@
-![45 degree](./45 degree.gif)
+![45 degree](45 degree.gif)
