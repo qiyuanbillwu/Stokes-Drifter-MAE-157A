@@ -325,3 +325,9 @@ def addNoiseToPercievedState(state, stdNoisePos, percNoiseOther):
     #print(nState)
 
     return nState;
+
+def rotate_vector_by_quat(v, q):
+    # v: 3D vector
+    v_q = [0] + list(v)  # convert to pure quaternion
+    q_conj = quat_conjugate(q)
+    return quat_multiply(quat_multiply(q, v_q), q_conj)[1:4]

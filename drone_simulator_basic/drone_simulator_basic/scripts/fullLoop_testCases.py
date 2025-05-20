@@ -15,6 +15,7 @@ import util
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
 from trajectory import get_state, get_state_simple
+import matplotlib.animation as animation
 
 ###################################################
 ############ Drone Simulation Function ############
@@ -185,6 +186,49 @@ def plotPos(dataOut, trajFunc):
     plt.legend()
     plt.grid()
     plt.ylim(-2,4)
+    plt.show()
+
+def animateDronePath(dataOut, trajFunc):
+    # Shows a 3D quiver plot with the normal vector of the drone
+    t = dataOut[:,0];
+    x = dataOut[:,1];
+    y = dataOut[:,2];
+    z = dataOut[:,3];
+
+    qw = dataOut[:,7];
+    qx = dataOut[:,8];
+    qy = dataOut[:,9];
+    qz = dataOut[:,10];
+
+    xd, yd, zd = [], [], []
+    for ti in t:
+        traj = trajFunc(ti)
+        xd.append(traj['r'][0])
+        yd.append(traj['r'][1])
+        zd.append(traj['r'][2])
+
+    zDrone = [0,0,1]
+
+    def update(frame):
+        # for each frame, update the data stored on each artist.
+        x = t[:frame]
+        y = z[:frame]
+        # update the scatter plot:
+        data = np.stack([x, y]).T
+        scat.set_offsets(data)
+        # update the line plot:
+        line2.set_xdata(t[:frame])
+        line2.set_ydata(z2[:frame])
+        return (scat, line2)
+    
+    fig, ax = plt.subplots()
+    
+    trajDES = ax.plot(xd, yd, zd, c="b", s=5, label='Desired Trajectory')
+    dronePOSE = ax.plot(x[0], y[0], z[0], label='Drone POSE')[0]
+    ax.set(xlim=[0, 3], ylim=[-4, 10], xlabel='Time [s]', ylabel='Z [m]')
+    ax.legend()
+
+    ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30)
     plt.show()
 
 ### SET UP INITIAL STATES & DRONE
