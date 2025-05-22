@@ -196,7 +196,7 @@ def get_state(t):
         n_cross = cross_matrix(n_hat)
         R_d = I + np.sin(theta) * n_cross + (1-np.cos(theta)) * n_cross @ n_cross 
         q_d = np.concatenate(([np.cos(theta/2)], n_hat*np.sin(theta)))
-        print("quarternion: ", q_d)
+        # print("quarternion: ", q_d)
 
         a_hat_dot = get_a_dot_hat(a_d, j)
         w = np.transpose(R_d) @ a_hat_dot
