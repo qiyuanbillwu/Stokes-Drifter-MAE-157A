@@ -4,9 +4,7 @@ import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
 
 # Update with actual file name in the data director
-
-file_name = "data\data_2025-05-13_10-52-07.csv"
-
+file_name = "/data/data_2025-05-22_14-14-14.csv"
 
 # Load in data as giant matrix
 data = np.loadtxt("../"+file_name, delimiter=',')
@@ -95,7 +93,7 @@ plt.ylabel('Quaternion [m]')
 plt.title('Quaternion vs Time')
 plt.legend()
 plt.grid()
-plt.ylim(-0.25,0.25)
+# plt.ylim(-0.25,0.25)
 
 
 # -- Motor Forces vs. Time --

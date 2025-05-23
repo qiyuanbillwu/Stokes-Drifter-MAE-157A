@@ -23,8 +23,8 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     e_vel = vel - np.array([vxdes, vydes, vzdes]) 
 
     # PID gains for position control
-    Kp = np.array([0.4, 0.4, 0.4])  # Adjust these gains as necessary
-    Kd = np.array([0.05, 0.05, 0.05])  # Adjust these gains as necessary
+    Kp = np.array([1, 0.4, 10])  # Adjust these gains as necessary
+    Kd = np.array([10, 10, 10])  # Adjust these gains as necessary
 
     accel_des = np.array([axdes, aydes, azdes])
 
@@ -64,7 +64,14 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
 
     adot_hat = get_a_dot_hat(a, a_dot)
 
-    omega_des = np.cross(a_hat, adot_hat)
+    # omega is in the form of (wy, -wx, 0)
+    # want omega_des in the form (wx, wy, 0)
+    omega = R_d.T @ adot_hat
+    omega_des = omega
+    omega_des[0] = -omega[1]
+    omega_des[1] = omega[0]
+
+    # omega_des = np.cross(a_hat, adot_hat)
     omega_des[2] = 0  # if yaw is not tracked
 
     return T, q_des, omega_des, lastVelError, prev_filtered_derivative
@@ -80,7 +87,7 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     q_e = quat_multiply(quat_conjugate(q_des), q_curr)
 
     # PD gains
-    Kp_vec = np.array([5.0, 5.0, 5.0])
+    Kp_vec = np.array([10.0, 10.0, 10.0])
     Kd_vec = np.array([0.2, 0.2, 0.2])
 
     Kp = np.diag(Kp_vec)

@@ -39,16 +39,51 @@ dt = 0.01
 # T = 10 # enough thrust to cancel out gravity at gate
 # theta = 45 * np.pi / 180 # angle of the gate
 
-# t0, t1, t2 = 0, 2, 4
-
-# ===== 90 degree =====
+# ===== 0 degree =====
 # boundary points and conditions
-x0, y0, z0 = 1, -1, 0.5
-x1, y1, z1 = -1, 0, 2
-x2, y2, z2 = 1, 1, 0.5
-vy = 3
-T = 3
-theta = 0 * np.pi / 180 # angle of the gate
+# x0, y0, z0 = 1, -1, 0.5
+# x1, y1, z1 = -1, 0, 2
+# x2, y2, z2 = 1, 1, 0.5
+# vy = 3
+# T = 4
+# theta = 0 * np.pi / 180 # angle of the gate
+
+# ===== -20 degree =====
+# boundary points and conditions
+# x0, y0, z0 = 1, -1, 0.5
+# x1, y1, z1 = -1, 0, 2
+# x2, y2, z2 = 1, 1, 0.5
+# vy = 3
+# T = 5
+# theta = -20 * np.pi / 180 # angle of the gate
+
+# ===== -30 degree =====
+# boundary points and conditions
+# x0, y0, z0 = 1, -1, 0.5
+# x1, y1, z1 = -1, 0, 2
+# x2, y2, z2 = 1, 1, 0.5
+# vy = 4
+# T = 5
+# theta = -30 * np.pi / 180 # angle of the gate
+
+# ===== -45 degree =====
+# boundary points and conditions
+# x0, y0, z0 = 1, -1, 0.5
+# x1, y1, z1 = -1, 0, 2
+# x2, y2, z2 = 1, 1, 0.5
+# vy = 3.5
+# T = 4.5
+# theta = -45 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.3, 2.6
+
+# ===== 180 degree =====
+# boundary points and conditions
+# x0, y0, z0 = 1, -1, 0.5
+# x1, y1, z1 = -1, 0, 2
+# x2, y2, z2 = 1, 1, 0.5
+# vy = 3
+# T = 3
+# theta = -90 * np.pi / 180 # angle of the gate
 
 t0, t1, t2 = 0, 1.5, 3
 
@@ -170,13 +205,20 @@ def get_state(t):
         # print(get_a_dot_hat(a_d, j))
 
         wx = -w[1]
-        w[1] = -w[0]
+        w[1] = w[0]
         w[0] = wx
         w[2] = 0
+
+        # print("w: ", w)
 
         a_hat_doubledot = s / np.linalg.norm(a_d) - (2 * j * (np.transpose(a_d) @ j) + a_d * (np.transpose(j) @ j + np.transpose(a_d) @ s)) / np.linalg.norm(a_d)**3 
         + 3 * a_d * (np.transpose(a_d) @ j)**2 / np.linalg.norm(a_d)**5
         wdot = np.transpose(R_d) @ a_hat_doubledot - cross_matrix(w) @ np.transpose(R_d) @ a_hat_dot
+
+        wdotx = -wdot[1]
+        wdot[1] = wdot[0]
+        wdot[0] = wdotx
+        wdot[2] = 0
 
     tau = J @ wdot + np.cross(w, J@w)
     # print("tau: ", tau)
