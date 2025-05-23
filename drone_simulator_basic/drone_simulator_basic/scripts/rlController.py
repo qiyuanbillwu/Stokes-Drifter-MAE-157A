@@ -49,13 +49,11 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     R_d = quat_to_rot(q_des)
 
     # =============
-    # how to apply a low-pass filter?
-
-    raw_derivative = (e_vel - lastVelError) / dt
-
-    alpha = 0.2
+    # Acceleration Tracking
+    raw_derivative = (e_vel - lastVelError) / dt # Error in acceleration over a single timestep
 
     # Apply low-pass filter to derivative only
+    alpha = 0.2
     filtered_derivative = alpha * prev_filtered_derivative + (1 - alpha) * raw_derivative
 
     prev_filtered_derivative = filtered_derivative
