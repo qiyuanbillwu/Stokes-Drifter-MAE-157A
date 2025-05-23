@@ -89,7 +89,7 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     q_e = quat_multiply(quat_conjugate(q_des), q_curr)
 
     # PD gains
-    Kp_vec = np.array([5.0, 5.0, 5.0])
+    Kp_vec = np.array([10.0, 10.0, 10.0])
     Kd_vec = np.array([0.2, 0.2, 0.2])
 
     Kp = np.diag(Kp_vec)
