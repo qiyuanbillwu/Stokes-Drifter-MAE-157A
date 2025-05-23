@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from trajectory import get_state, x1, y1, z1, theta
 from util import rotate_vector_by_quat
 
-file_name = "data\data_2025-05-20_10-22-36.csv"
+file_name = "data/data_2025-05-23_15-35-41.csv"
 data = np.loadtxt("../"+file_name, delimiter=',')
 
 # Data from File
@@ -108,11 +108,11 @@ def update(frame):
     return line, quiver, point, time_text
 
 # Run animation
-fps = 60
+fps = 600
 ani = FuncAnimation(fig, update, frames=len(ts), init_func=init,
                    interval=1000/fps, blit=False)
 
-ani.save("../data/simulated_90deg_animation.mp4",
+ani.save("../data/simulated_minus90deg_animation.mp4",
          writer='ffmpeg',
          fps=fps,
          #extra_args=['-vcodec', 'libx264']
