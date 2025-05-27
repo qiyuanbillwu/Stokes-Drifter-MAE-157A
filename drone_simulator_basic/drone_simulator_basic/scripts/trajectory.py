@@ -41,12 +41,12 @@ dt = 0.01
 
 # ===== 0 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
-# x2, y2, z2 = 1, 1, 0.5
-# vy = 3
-# T = 4
-# theta = 0 * np.pi / 180 # angle of the gate
+x0, y0, z0 = 1, -1, 0.5
+x1, y1, z1 = -1, 0, 2
+x2, y2, z2 = 1, 1, 0.5
+vy = 3
+T = 4
+theta = 0 * np.pi / 180 # angle of the gate
 
 # ===== -20 degree =====
 # boundary points and conditions
