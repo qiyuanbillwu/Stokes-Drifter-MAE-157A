@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from util import get_a_dot_hat, cross_matrix, allocation_matrix
-from constants import J, l, d, m
+from constants import J, l, d, m, g
 
 a_matrix  = allocation_matrix(l, d)
 
@@ -23,8 +23,6 @@ def compute_A(t0, t1):
     return A
 
 # global constants
-g = 9.81
-m = 0.5
 dt = 0.01
 
 # theta is the angle between the thrust vector and horizontal
@@ -32,12 +30,12 @@ dt = 0.01
 
 # ===== 45 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 1.5
-# x2, y2, z2 = 1, 1, 0.5
-# vy = 3.0
-# T = 10 # enough thrust to cancel out gravity at gate
-# theta = 45 * np.pi / 180 # angle of the gate
+x0, y0, z0 = 1, -1, 0.5
+x1, y1, z1 = -1, 0, 1.5
+x2, y2, z2 = 1, 1, 0.5
+vy = 2.0
+T = 10 # enough thrust to cancel out gravity at gate
+theta = 45 * np.pi / 180 # angle of the gate
 
 # ===== 0 degree =====
 # boundary points and conditions
@@ -85,7 +83,7 @@ dt = 0.01
 # T = 3
 # theta = -90 * np.pi / 180 # angle of the gate
 
-t0, t1, t2 = 0, 1.5, 3
+t0, t1, t2 = 0, 3, 6
 
 r0 = np.array([x0, y0, z0])
 v0 = np.array([0, 0, 0])
@@ -255,7 +253,7 @@ def get_state(t):
         "f": f,          # force
         "adhat": a_d_hat
     }
-    # print(state)
+    print(state)
 
     return state
 
@@ -480,4 +478,4 @@ forces = np.array(forces)
 # plt.legend()
 # plt.show()
 
-# get_state(0.01)
+get_state(1.5)
