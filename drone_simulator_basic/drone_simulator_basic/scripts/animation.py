@@ -15,7 +15,7 @@ adhat = np.array([get_state(t)['adhat'] for t in ts])
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection='3d')
 
-ax.view_init(elev=20, azim=170)
+ax.view_init(elev=15, azim=160)
 
 # Rectangle parameters (x-axis aligned)
 rect_center = np.array([x1, y1, z1])
