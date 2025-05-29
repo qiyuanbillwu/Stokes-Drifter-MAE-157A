@@ -7,7 +7,7 @@ a_matrix  = allocation_matrix(l, d)
 
 # compute the matrix to solve polynomial coeffcient 
 def compute_A(t0, t1):
-    A = np.zeros((8, 8))
+    A = np.zeros((8, 8)) 
     for col in range(8):
         A[0, col] = t0**col
         A[4, col] = t1**col
@@ -30,23 +30,22 @@ dt = 0.01
 
 # ===== 45 degree conservative =====
 # boundary points and conditions
-# x0, y0, z0 = -1, 1, 0.5
-# x1, y1, z1 = 0, 0, 1.5
-# x2, y2, z2 = 1, 1, 0.5
-# vx = 2.0
-# theta = 45 * np.pi / 180 # angle of the gate
-# T = m * g / np.sin(theta) # enough thrust to cancel out gravity at gate
-# t0, t1, t2 = 0, 1.5, 3
+x0, y0, z0 = 1, -1, 0.5
+x1, y1, z1 = -1, 0, 1.5
+x2, y2, z2 = 1, 1, 0.5
+vy = 3.0
+T = 10 # enough thrust to cancel out gravity at gate
+theta = 45 * np.pi / 180 # angle of the gate
 
 # ===== 45 degree =====
 # boundary points and conditions
-x0, y0, z0 = -1, 1, 0.5
-x1, y1, z1 = 0, 0, 1.5
-x2, y2, z2 = 1, 1, 0.5
-vx = 3.0
-theta = 45 * np.pi / 180 # angle of the gate
-T = m * g / np.sin(theta) # enough thrust to cancel out gravity at gate
-t0, t1, t2 = 0, 1.5, 3
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, 0, 1.5
+# x2, y2, z2 = 1, 1, 0.5
+# vx = 3.0
+#theta = 45 * np.pi / 180 # angle of the gate
+# T = m * g / np.sin(theta) # enough thrust to cancel out gravity at gate
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== 0 degree =====
 # boundary points and conditions
@@ -489,4 +488,4 @@ forces = np.array(forces)
 # plt.legend()
 # plt.show()
 
-get_state(1.5)
+#print(get_state(1.5))
