@@ -1,0 +1,103 @@
+### Import python packages ###
+import numpy as np
+import matplotlib.pyplot as plt
+from trajectory import get_state, get_state_simple
+
+# get desired trajectory 
+pos = []
+q = []
+
+t0 = 0
+t2 = 3
+dt = 0.01
+
+ts = np.arange(t0, t2, dt)
+
+for t in ts:
+    state = get_state(t)
+    pos.append(state['r'])
+    q.append(state['q'])
+
+pos = np.array(pos)
+q = np.array(q)
+
+filename1 = "/data/team2-selected/test3_inner_loop.csv"
+filename2 = "/data/team2-selected/test3_outer_loop.csv"
+
+data1 = np.loadtxt("../"+filename1, delimiter=',', skiprows = 1)
+data2 = np.loadtxt("../"+filename2, delimiter=',', skiprows = 1)
+
+t1 = data1[:, 0] 
+t1 -= t1[0]
+qw1 = data1[:, 1]
+qx1 = data1[:, 2]
+qy1 = data1[:, 3]
+qz1 = data1[:, 4]
+
+# target = 50.4
+# target = 17
+target = 15.7
+index1 = np.abs(t1 - target).argmin()
+# target = 53.4
+# target = 20
+target = 18.7
+index2 = np.abs(t1 - target).argmin()
+
+t1 = t1[index1:index2]
+t1 -= t1[0]
+qw1 = qw1[index1:index2]
+qx1 = qx1[index1:index2]
+qy1 = qy1[index1:index2]
+qz1 = qz1[index1:index2]
+
+plt.figure(1)
+plt.plot(t1, qw1, label = 'qw')
+plt.plot(ts, q[:, 0], label = "qw_d", linestyle='--')
+plt.legend()
+
+plt.figure(2)
+plt.plot(t1, qx1, label = 'qx')
+plt.plot(ts, q[:, 1], label = "qx_d", linestyle='--')
+plt.legend()
+
+plt.figure(3)
+plt.plot(t1, qy1, label = 'qy')
+plt.plot(ts, q[:, 2], label = "qy_d", linestyle='--')
+plt.legend()
+
+plt.figure(4)
+plt.plot(t1, qz1, label = 'qz')
+plt.plot(ts, q[:, 3], label = "qz_d", linestyle='--')
+plt.legend()
+
+t2 = data2[:, 0] 
+t2 -= t2[0]
+x2 = data2[:, 1]
+y2 = data2[:, 2]
+z2 = data2[:, 3]
+
+# target = 50.4
+# target = 17
+target = 15.7
+index1 = np.abs(t2 - target).argmin()
+# target = 53.4
+# target = 20
+target = 18.7
+index2 = np.abs(t2 - target).argmin()
+
+t2 = t2[index1:index2]
+t2 -= t2[0]
+x2 = x2[index1:index2]
+y2 = y2[index1:index2]
+z2 = z2[index1:index2]
+
+plt.figure(5)
+plt.plot(t2, x2, label = 'x')
+plt.plot(t2, y2, label = 'y')
+plt.plot(t2, z2, label = 'z')
+plt.plot(ts, pos[:, 0], label = "xd", linestyle='--')
+plt.plot(ts, pos[:, 1], label = "yd", linestyle='--')
+plt.plot(ts, pos[:, 2], label = "zd", linestyle='--')
+plt.legend()
+
+plt.show()
