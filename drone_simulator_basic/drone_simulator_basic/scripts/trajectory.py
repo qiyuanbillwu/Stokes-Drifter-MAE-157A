@@ -47,6 +47,7 @@ dt = 0.01
 # T = m * g / np.sin(theta) # enough thrust to cancel out gravity at gate
 # t0, t1, t2 = 0, 1.5, 3
 
+# this is the 90 degree one 
 # ===== 0 degree =====
 # boundary points and conditions
 x0, y0, z0 = -1, 1, 0.5
@@ -59,31 +60,33 @@ t0, t1, t2 = 0, 1.5, 3
 
 # ===== -20 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2
 # x2, y2, z2 = 1, 1, 0.5
-# vy = 3
+# vx = 3
 # T = 5
 # theta = -20 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== -30 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2
 # x2, y2, z2 = 1, 1, 0.5
-# vy = 4
+# vx = 2
 # T = 5
 # theta = -30 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== -45 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2
 # x2, y2, z2 = 1, 1, 0.5
-# vy = 3.5
-# T = 4.5
+# vx = 2
+# T = 6
 # theta = -45 * np.pi / 180 # angle of the gate
-# t0, t1, t2 = 0, 1.3, 2.6
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== 180 degree =====
 # boundary points and conditions
@@ -93,6 +96,16 @@ t0, t1, t2 = 0, 1.5, 3
 # vy = 3
 # T = 3
 # theta = -90 * np.pi / 180 # angle of the gate
+
+# ===== -90 degree =====
+# boundary points and conditions
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2.7
+# x2, y2, z2 = 1, 1, 0.5
+# vx = 2
+# T = 7
+# theta = -90 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.2, 2.4
 
 r0 = np.array([x0, y0, z0])
 v0 = np.array([0, 0, 0])
