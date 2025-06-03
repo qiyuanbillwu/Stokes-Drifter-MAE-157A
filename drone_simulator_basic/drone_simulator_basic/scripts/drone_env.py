@@ -17,12 +17,16 @@ class DroneEnv(gym.Env):
         self.dt = 1./500
         self.dyn = dynamics([g, m, l, Cd, Cl, J], self.dt)
         self.max_time = 3.0
-        self.reset()
+        self.t = 0.0
+        state = np.zeros(13)
+        state[0:3] = get_state(0.0)['r']
+        state[6] = 1.0  # initial quaternion
+        self.state = state
 
         # Action: 4 motor thrusts normalized
         self.action_space = spaces.Box(low=0, high=1, shape=(4,), dtype=np.float32)
 
-        # Observation: position, velocity, quaternion, angular velocity (13D)
+        # Observation:
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(20,), dtype=np.float32)
 
     def reset(self, seed=None, options=None):
@@ -37,7 +41,11 @@ class DroneEnv(gym.Env):
         self.prev_filtered_derivative = 0
         goal_pos = self.traj(self.t)['r']
         goal_vel = self.traj(self.t)['v']
-        obs = np.concatenate([[self.t], self.state, goal_pos, goal_vel])
+
+        pos_error = goal_pos - self.state[0:3]
+        vel_error = goal_vel - self.state[3:6]
+        obs = np.concatenate([[self.t], self.state, pos_error, vel_error])
+
         return obs, {}
     
     def step(self, action):
@@ -62,19 +70,26 @@ class DroneEnv(gym.Env):
 
         #print(f"f_agent: {f_agent}, f_true: {f_true}")
 
-        # Reward is negative MSE between agent and true thrusts
-        abs_error = np.mean(np.abs(f_agent - f_true))
-        reward = 1.0 - abs_error   
-
         goal_pos = desired['r']
         goal_vel = desired['v']
-        obs = np.concatenate([[self.t], self.state, goal_pos, goal_vel])
+
+        pos_error = goal_pos - self.state[0:3]
+        vel_error = goal_vel - self.state[3:6]
+        obs = np.concatenate([[self.t], self.state, pos_error, vel_error])
+
+        # Reward is negative MSE between agent and true thrusts
+        abs_error = np.mean(np.abs(f_agent - f_true))
+        
+        reward = 1 - (1.0 * np.linalg.norm(pos_error) + 0.1 * np.linalg.norm(vel_error) + 0.5 * abs_error)
 
         terminated = self.state[2] < 0.1
         truncated = self.t >= self.max_time
 
+        if truncated and not terminated:
+            reward += 1000.0 
+
         if terminated:
-            reward -= 2000.0
+            reward -= 1000.0
 
         return obs, reward, terminated, truncated, {}
 
