@@ -30,12 +30,12 @@ dt = 0.01
 
 # ===== 45 degree conservative =====
 # boundary points and conditions
-x0, y0, z0 = 1, -1, 0.5
-x1, y1, z1 = -1, 0, 1.5
-x2, y2, z2 = 1, 1, 0.5
-vy = 3.0
-T = 10 # enough thrust to cancel out gravity at gate
-theta = 45 * np.pi / 180 # angle of the gate
+# x0, y0, z0 = 1, -1, 0.5
+# x1, y1, z1 = -1, 0, 1.5
+# x2, y2, z2 = 1, 1, 0.5
+# vy = 3.0
+# T = 10 # enough thrust to cancel out gravity at gate
+# theta = 45 * np.pi / 180 # angle of the gate
 
 # ===== 45 degree =====
 # boundary points and conditions
@@ -49,12 +49,13 @@ theta = 45 * np.pi / 180 # angle of the gate
 
 # ===== 0 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
-# x2, y2, z2 = 1, 1, 0.5
-# vy = 3
-# T = 4
-# theta = 0 * np.pi / 180 # angle of the gate
+x0, y0, z0 = -1, 1, 0.5
+x1, y1, z1 = 0, -1, 2
+x2, y2, z2 = 1, 1, 0.5
+vx = 3
+T = 4
+theta = 0 * np.pi / 180 # angle of the gate
+t0, t1, t2 = 0, 1.5, 3
 
 # ===== -20 degree =====
 # boundary points and conditions
