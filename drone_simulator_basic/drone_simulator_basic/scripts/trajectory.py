@@ -23,14 +23,12 @@ def compute_A(t0, t1):
     return A
 
 # global constants
-g = 9.81
-m = 0.745
 dt = 0.01
 
 # theta is the angle between the thrust vector and horizontal
 # theta = 0 means a 90 degree gate
 
-# ===== 45 degree =====
+# ===== 45 degree conservative =====
 # boundary points and conditions
 x0, y0, z0 = 1, -1, 0.5
 x1, y1, z1 = -1, 0, 1.5
@@ -38,6 +36,16 @@ x2, y2, z2 = 1, 1, 0.5
 vy = 3.0
 T = 10 # enough thrust to cancel out gravity at gate
 theta = 45 * np.pi / 180 # angle of the gate
+
+# ===== 45 degree =====
+# boundary points and conditions
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, 0, 1.5
+# x2, y2, z2 = 1, 1, 0.5
+# vx = 3.0
+#theta = 45 * np.pi / 180 # angle of the gate
+# T = m * g / np.sin(theta) # enough thrust to cancel out gravity at gate
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== 0 degree =====
 # boundary points and conditions
@@ -85,18 +93,18 @@ theta = 45 * np.pi / 180 # angle of the gate
 # T = 3
 # theta = -90 * np.pi / 180 # angle of the gate
 
-t0, t1, t2 = 0, 1.5, 3
-
 r0 = np.array([x0, y0, z0])
 v0 = np.array([0, 0, 0])
 a0 = np.array([0, 0, 0])
 j0 = np.array([0, 0, 0])
 r1 = np.array([x1, y1, z1])
-v1 = np.array([0, vy, 0])
-a1 = np.array([T*np.cos(theta)/m, 0, T*np.sin(theta)/m-g])
+v1 = np.array([vx, 0, 0])
+a1 = np.array([0, T*np.cos(theta)/m, T*np.sin(theta)/m-g])
 j1 = np.array([0, 0, 0])
 r2 = np.array([x2, y2, z2])
 v2, a2, j2 = v0, a0, j0
+
+# print("a1: ", a1)
 
 A1 = compute_A(t0, t1)
 A2 = compute_A(t1, t2)
