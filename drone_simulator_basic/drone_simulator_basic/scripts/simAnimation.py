@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from trajectory import get_state, x1, y1, z1, theta
 from util import rotate_vector_by_quat
 
-file_name = "data/data_2025-05-23_15-35-41.csv"
+file_name = "/data/data_2025-06-04_12-59-30.csv"
 data = np.loadtxt("../"+file_name, delimiter=',')
 
 # Data from File
@@ -36,28 +36,30 @@ adhat = np.array([get_state(t)['adhat'] for t in ts])
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection='3d')
 
+ax.view_init(elev=15, azim=160)
+
 # Draw desired trajectory (static, dashed blue)
 ax.plot(desiredPos[:, 0], desiredPos[:, 1], desiredPos[:, 2], 'g--', label='Desired Trajectory')
 
-# Rectangle parameters (y-axis aligned)
+# Rectangle parameters (x-axis aligned)
 rect_center = np.array([x1, y1, z1])
-width, height = 0.3, 0.6
-rotation_angle = -theta * 180 / np.pi  # degrees
+width, height = 0.4, 0.7
+rotation_angle = theta * 180 / np.pi  # degrees
 
-# Create rectangle vertices (XZ plane)
+# Create rectangle vertices (YZ plane)
 def create_rotated_rectangle(center, width, height, angle):
     corners = np.array([
-        [-width/2, 0, -height/2],
-        [width/2, 0, -height/2],
-        [width/2, 0, height/2],
-        [-width/2, 0, height/2]
+        [0, -width/2, -height/2],
+        [0, width/2, -height/2],
+        [0, width/2, height/2],
+        [0, -width/2, height/2]
     ])
-    # Rotation matrix (y-axis)
+    # Rotation matrix (x-axis)
     theta = np.radians(angle)
     rot = np.array([
-        [np.cos(theta), 0, np.sin(theta)],
-        [0, 1, 0],
-        [-np.sin(theta), 0, np.cos(theta)]
+        [1, 0, 0],
+        [0, np.cos(theta), -np.sin(theta)],
+        [0, np.sin(theta), np.cos(theta)]
     ])
     # Apply rotation and translation
     return np.dot(corners, rot.T) + center
@@ -112,7 +114,7 @@ fps = 600
 ani = FuncAnimation(fig, update, frames=len(ts), init_func=init,
                    interval=1000/fps, blit=False)
 
-ani.save("../data/simulated_minus90deg_animation.mp4",
+ani.save("../data/simulated_45deg_animation.mp4",
          writer='ffmpeg',
          fps=fps,
          #extra_args=['-vcodec', 'libx264']
