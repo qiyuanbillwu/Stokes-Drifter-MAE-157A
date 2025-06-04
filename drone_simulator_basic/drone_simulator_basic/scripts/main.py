@@ -23,7 +23,7 @@ from util import addNoiseToPercievedState;
 
 
 # Save data flag
-save_data = False
+save_data = True
 
 # Initial conditions
 t = 0.0
