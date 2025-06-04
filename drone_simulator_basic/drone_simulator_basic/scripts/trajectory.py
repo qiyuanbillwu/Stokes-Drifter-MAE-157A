@@ -1,13 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from util import get_a_dot_hat, cross_matrix, allocation_matrix
-from constants import J, l, d, m
+from constants import J, l, d, m, g
 
 a_matrix  = allocation_matrix(l, d)
 
 # compute the matrix to solve polynomial coeffcient 
 def compute_A(t0, t1):
-    A = np.zeros((8, 8))
+    A = np.zeros((8, 8)) 
     for col in range(8):
         A[0, col] = t0**col
         A[4, col] = t1**col
@@ -23,14 +23,12 @@ def compute_A(t0, t1):
     return A
 
 # global constants
-g = 9.81
-m = 0.5
 dt = 0.01
 
 # theta is the angle between the thrust vector and horizontal
 # theta = 0 means a 90 degree gate
 
-# ===== 45 degree =====
+# ===== 45 degree conservative =====
 # boundary points and conditions
 # x0, y0, z0 = 1, -1, 0.5
 # x1, y1, z1 = -1, 0, 1.5
@@ -39,42 +37,56 @@ dt = 0.01
 # T = 10 # enough thrust to cancel out gravity at gate
 # theta = 45 * np.pi / 180 # angle of the gate
 
+# ===== 45 degree =====
+# boundary points and conditions
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, 0, 1.5
+# x2, y2, z2 = 1, 1, 0.5
+# vx = 3.0
+#theta = 45 * np.pi / 180 # angle of the gate
+# T = m * g / np.sin(theta) # enough thrust to cancel out gravity at gate
+# t0, t1, t2 = 0, 1.5, 3
+
+# this is the 90 degree one 
 # ===== 0 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
-# x2, y2, z2 = 1, 1, 0.5
-# vy = 3
-# T = 4
-# theta = 0 * np.pi / 180 # angle of the gate
+x0, y0, z0 = -1, 1, 0.5
+x1, y1, z1 = 0, -1, 2
+x2, y2, z2 = 1, 1, 0.5
+vx = 3
+T = 4
+theta = 0 * np.pi / 180 # angle of the gate
+t0, t1, t2 = 0, 1.5, 3
 
 # ===== -20 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2
 # x2, y2, z2 = 1, 1, 0.5
-# vy = 3
+# vx = 3
 # T = 5
 # theta = -20 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== -30 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2
 # x2, y2, z2 = 1, 1, 0.5
-# vy = 4
+# vx = 2
 # T = 5
 # theta = -30 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== -45 degree =====
 # boundary points and conditions
-# x0, y0, z0 = 1, -1, 0.5
-# x1, y1, z1 = -1, 0, 2
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2
 # x2, y2, z2 = 1, 1, 0.5
-# vy = 3.5
-# T = 4.5
+# vx = 2
+# T = 6
 # theta = -45 * np.pi / 180 # angle of the gate
-# t0, t1, t2 = 0, 1.3, 2.6
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== 180 degree =====
 # boundary points and conditions
@@ -85,18 +97,28 @@ dt = 0.01
 # T = 3
 # theta = -90 * np.pi / 180 # angle of the gate
 
-t0, t1, t2 = 0, 1.5, 3
+# ===== -90 degree =====
+# boundary points and conditions
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2.7
+# x2, y2, z2 = 1, 1, 0.5
+# vx = 2
+# T = 7
+# theta = -90 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.2, 2.4
 
 r0 = np.array([x0, y0, z0])
 v0 = np.array([0, 0, 0])
 a0 = np.array([0, 0, 0])
 j0 = np.array([0, 0, 0])
 r1 = np.array([x1, y1, z1])
-v1 = np.array([0, vy, 0])
-a1 = np.array([T*np.cos(theta)/m, 0, T*np.sin(theta)/m-g])
+v1 = np.array([vx, 0, 0])
+a1 = np.array([0, T*np.cos(theta)/m, T*np.sin(theta)/m-g])
 j1 = np.array([0, 0, 0])
 r2 = np.array([x2, y2, z2])
 v2, a2, j2 = v0, a0, j0
+
+# print("a1: ", a1)
 
 A1 = compute_A(t0, t1)
 A2 = compute_A(t1, t2)
@@ -480,4 +502,4 @@ forces = np.array(forces)
 # plt.legend()
 # plt.show()
 
-# get_state(0.01)
+#print(get_state(1.5))

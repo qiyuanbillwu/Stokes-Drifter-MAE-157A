@@ -23,7 +23,7 @@ from util import addNoiseToPercievedState;
 
 
 # Save data flag
-save_data = True
+save_data = False
 
 # Initial conditions
 t = 0.0
@@ -64,7 +64,7 @@ state[12] = 0.
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 # Final time
-tf = 8
+tf = 3
 
 # Simulation rate
 rate = 500
@@ -96,8 +96,8 @@ while running:
     trajectory = get_state(t)
 
     # 5 cm positional error, 50% other error
-    posErr = 0.5 #m std
-    otherErr_percentage = 0.5; # 50% std
+    posErr = 0 #m std
+    otherErr_percentage = 0; # 50% std
     percievedState = addNoiseToPercievedState(state, posErr, otherErr_percentage)
 
     # Run outer-loop controller to get thrust and references for inner loop 

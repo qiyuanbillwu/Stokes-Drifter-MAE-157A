@@ -118,4 +118,11 @@ def inner_loop_controller(state, q_des, omega_des, T, l, d):
     # Solve for motor forces
     f = np.linalg.solve(mix, tau_full)
 
-    return f
+    #print(f)
+
+    lower_bound = 0.054*9.81
+    upper_bound = 0.393*9.81
+
+    f_clipped = np.clip(f, lower_bound, upper_bound)
+
+    return f_clipped
