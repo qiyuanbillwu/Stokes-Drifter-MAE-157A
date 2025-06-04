@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 print("Current Working Directory:", os.getcwd())
 
 ### Import custom modules and classes ###
-import util
 import dynamics
 from rlController import outer_loop_controller, inner_loop_controller
 from trajectory import get_state, get_state_simple
 import matplotlib.animation as animation
+from util import addNoiseToPercievedState;
 
 ###################################################
 ############ Drone Simulation Function ############
@@ -32,7 +32,7 @@ def cleanSlate():
 
     return t0, f0, s0;
 
-def sim(dt, tf, forces, state, dyn, trajFunc, save_data):
+def sim(dt, tf, forces, state, dyn, trajFunc, save_data, allow_crash, noiseTuple):
     t = 0.0;
     f = forces;
 
@@ -51,6 +51,13 @@ def sim(dt, tf, forces, state, dyn, trajFunc, save_data):
     lastVelError = 0
     prev_filtered_derivative = 0
 
+    # positional error, other error
+    posErr = noiseTuple[0]; # 0.05 = cm std dev
+    otherErr_percentage = noiseTuple[1]; # 15% = 0.15
+    lastSensorUpdate = t;
+    percievedState = addNoiseToPercievedState(state, posErr, otherErr_percentage)
+    dataP = np.append(t,percievedState)
+
     # Simulation loop
     running = True
     while running:
@@ -60,14 +67,18 @@ def sim(dt, tf, forces, state, dyn, trajFunc, save_data):
         # trajectory = get_state_simple(t) # for simple trajectories between 2 points
         trajectory = trajFunc(t)
 
+        if ((lastSensorUpdate + dt_sensorUpdate) <= t):
+            # Update Percieved State
+            percievedState = addNoiseToPercievedState(state, posErr, otherErr_percentage);
+            lastSensorUpdate = lastSensorUpdate + dt_sensorUpdate;
+
         # Run outer-loop controller to get thrust and references for inner loop 
         # Outer-loop controller
-        T, q_des, omega_des, lastVelError, prev_filtered_derivative = outer_loop_controller(state, trajectory, m, g, dt, lastVelError, prev_filtered_derivative)
+        T, q_des, omega_des, lastVelError, prev_filtered_derivative = outer_loop_controller(percievedState, trajectory, m, g, dt, lastVelError, prev_filtered_derivative)
 
         # Run inner-loop controller to get motor forces 
         # Inner-loop controller
-        
-        f = inner_loop_controller(state, q_des, omega_des, T, l, dyn.d)
+        f = inner_loop_controller(percievedState, q_des, omega_des, T, l, dyn.d)
 
         # Propagate dynamics with control inputs
         #print(state.shape)
@@ -75,7 +86,7 @@ def sim(dt, tf, forces, state, dyn, trajFunc, save_data):
         state = dyn.propagate(state, f, dt)
     
         # If z to low then indicate crash and end simulation
-        if state[2] < 0.1:
+        if (state[2] <= 0) and (allow_crash):
             print("CRASH!!!")
             break
 
@@ -85,6 +96,9 @@ def sim(dt, tf, forces, state, dyn, trajFunc, save_data):
         tmp = np.append(tmp,q_des)
         tmp = np.append(tmp,omega_des)
         data = np.vstack((data,tmp))
+
+        tmp = np.append(t,percievedState)
+        dataP = np.vstack((dataP, tmp))
 
         # Update time
         t += dt 
@@ -109,7 +123,7 @@ def sim(dt, tf, forces, state, dyn, trajFunc, save_data):
 
             np.savetxt("../data/"+file_name, data, delimiter=",")
 
-    return data;
+    return data, dataP;
 
 # Plot Orientation
 def plotQuat(dataOut):
@@ -126,6 +140,7 @@ def plotQuat(dataOut):
     plt.plot(tArr, dataOut[:,19], label="qx_des", linestyle="--", color = "red")
     plt.plot(tArr, dataOut[:,20], label="qy_des", linestyle="--", color = "blue")
     plt.plot(tArr, dataOut[:,21], label="qz_des", linestyle="--", color = "green")
+    plt.title("Orientation Tracking")
     plt.legend()
     plt.show()
 
@@ -144,7 +159,7 @@ def plotW(dataOut):
     plt.legend()
     plt.show()
 
-def plotPos(dataOut, trajFunc):
+def plotPos(dataOut, trajFunc, titleStr = "Position vs Time"):
     # --- Position vs Time ---
     t = dataOut[:,0];
     x = dataOut[:,1];
@@ -174,18 +189,38 @@ def plotPos(dataOut, trajFunc):
         wzdes.append(traj['w'][2])
 
     plt.figure(1)
-    plt.plot(t, x, label='x')
-    plt.plot(t, y, label='y')
-    plt.plot(t, z, label='z')
-    plt.plot(t, xd, label='xd', linestyle='--')
-    plt.plot(t, yd, label='yd', linestyle='--')
-    plt.plot(t, zd, label='zd', linestyle='--')
+    plt.plot(t, x, label='x',color='red')
+    plt.plot(t, y, label='y',color="blue")
+    plt.plot(t, z, label='z',color="green")
+    plt.plot(t, xd, label='xd', linestyle='--',color='red')
+    plt.plot(t, yd, label='yd', linestyle='--',color="blue")
+    plt.plot(t, zd, label='zd', linestyle='--',color="green")
     plt.xlabel('Time [s]')
     plt.ylabel('Position [m]')
-    plt.title('Position vs Time')
+    plt.title(titleStr)
     plt.legend()
     plt.grid()
     plt.ylim(-2,4)
+    plt.show()
+
+def plotPerc(data, dataP):
+    t = data[:,0]
+    x = data[:,1]
+    y = data[:,2]
+    z = data[:,3]
+    xP = dataP[:,1]
+    yP = dataP[:,2]
+    zP = dataP[:,3]
+    plt.plot(t,x,linestyle='-',color='red', label="x")
+    plt.plot(t,xP,linestyle='--',color='red')
+    plt.plot(t,y,linestyle='-',color='blue',label="y")
+    plt.plot(t,yP,linestyle='--',color='blue')
+    plt.plot(t,z,linestyle='-',color='green',label="z")
+    plt.plot(t,zP,linestyle='--',color='green')
+    plt.title("Percieved Position vs. Actual Position")
+    plt.xlabel("Time [s]")
+    plt.ylabel("Pos [m]")
+    plt.legend()
     plt.show()
 
 def animateDronePath(dataOut, trajFunc):
@@ -231,11 +266,20 @@ def animateDronePath(dataOut, trajFunc):
     ani = animation.FuncAnimation(fig=fig, func=update, frames=40, interval=30)
     plt.show()
 
+## WHERE THE STUFF HAPPENS ========================================================================================
 ### SET UP INITIAL STATES & DRONE
 t0, f0, s0 = cleanSlate()
 
-rate = 500;
+rate = 1000;
 dt = 1.0/rate;
+
+rate_sensorUpdate = 100;
+dt_sensorUpdate = 1.0/rate_sensorUpdate;
+
+if (rate_sensorUpdate > rate):
+    dt = dt_sensorUpdate
+
+noiseTuple = (0.1,0.5)
 
 # Import Values from constants.py
 from constants import g, m, l, Cd, Cl, d, J
@@ -243,5 +287,10 @@ from constants import g, m, l, Cd, Cl, d, J
 # Initialize dynamics
 droneDyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 
-dataOut = sim(dt, 3.0, f0, s0, droneDyn, get_state_simple, False)
-plotPos(dataOut, get_state_simple)
+titleStr = f"Position vs Time | Noise: {noiseTuple[0]*100}cm POS, {noiseTuple[1]*100}% IMU | {rate_sensorUpdate} Hz Sensor Refresh"
+trajFunc = get_state
+dataOut, dataP = sim(dt, 3.0, f0, s0, droneDyn, trajFunc, False, True, noiseTuple)
+plotPos(dataOut, trajFunc, titleStr)
+plotQuat(dataOut)
+
+plotPerc(dataOut,dataP)

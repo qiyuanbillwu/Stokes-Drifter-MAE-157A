@@ -304,24 +304,33 @@ def noise_percent(idealValue, mu, sigma):
 def noise_offset(idealValue, mu, sigma):
     #mu, sigma = 0, 0.1 # example mean and standard deviation
     s = np.random.normal(mu, sigma, 1)
-    return idealValue * s;
+    return (idealValue + s);
 
 # Summary of States Array
 # state = [posX, posY, posZ, velX, velY, velZ, qw, qx, qy, qz, wx, wy, wz]
 # index >>  0     1     2     3     4     5    6   7   8   9   10  11  12
 
 def addNoiseToPercievedState(state, stdNoisePos, percNoiseOther):
+    # Add Offset Noise to Position
     pos = state[0:3]
-    nPos = noise_percent(pos,0,stdNoisePos)
+    nPos = noise_offset(pos,0,stdNoisePos)
 
-    other = state[3:13]
-    nOther = noise_percent(other,0,percNoiseOther)
+    # No Noise to Velocity
+    vel = state[3:6]
+    nVel = noise_percent(vel,0,percNoiseOther)
 
-    # Normalize Unit Quaternion
-    nQ = nOther[3:7];
-    nOther[3:7] = normalize_quaternion_wxyz(nQ)
+    # Percent Noise on Orientation
+    Q = state[6:10]
+    nQ = noise_percent(Q,0,percNoiseOther) + noise_offset(Q, 0, 0.2 * percNoiseOther);
+    nQ = normalize_quaternion_wxyz(nQ)
 
-    nState = np.append(nPos, nOther);
+    # Percent Noise on Angular Velocity
+    w = state[10:13]
+    nw = noise_percent(w,0,percNoiseOther)
+
+    nState = np.append(nPos, nVel);
+    nState = np.append(nState, nQ);
+    nState = np.append(nState, nw);
     #print(nState)
 
     return nState;

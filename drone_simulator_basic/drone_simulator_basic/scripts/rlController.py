@@ -23,8 +23,8 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     e_vel = vel - np.array([vxdes, vydes, vzdes]) 
 
     # PID gains for position control
-    Kp = np.array([1, 0.4, 10])  # Adjust these gains as necessary
-    Kd = np.array([10, 10, 10])  # Adjust these gains as necessary
+    Kp = np.array([5, 5, 5])  # Adjust these gains as necessary
+    Kd = np.array([0.1, 0.1, 0.1])  # Adjust these gains as necessary
 
     accel_des = np.array([axdes, aydes, azdes])
 
@@ -71,7 +71,13 @@ def outer_loop_controller(state, trajectory, mass, g, dt, lastVelError, prev_fil
     omega_des[0] = -omega[1]
     omega_des[1] = omega[0]
 
-    # omega_des = np.cross(a_hat, adot_hat)
+    # Angular velocity in world frame: ω = â × â̇
+    omega_world = np.cross(a_hat, adot_hat)
+
+    # Convert to body frame using R_des
+    omega_des = R_d.T @ omega_world
+
+    #omega_des = np.cross(a_hat, adot_hat)
     omega_des[2] = 0  # if yaw is not tracked
 
     return T, q_des, omega_des, lastVelError, prev_filtered_derivative
