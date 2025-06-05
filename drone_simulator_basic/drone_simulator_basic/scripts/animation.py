@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from trajectory import get_state, x1, y1, z1, theta
+from trajectory import get_state, x1, y1, z1, theta, t0 ,t2
 
 # Initialize data
-t0, t2, dt = 0, 3, 0.01
+dt = 0.01
 ts = np.arange(t0, t2, dt)
 pos = np.array([get_state(t)['r'] for t in ts])
 adhat = np.array([get_state(t)['adhat'] for t in ts])
@@ -80,7 +80,14 @@ def update(frame):
     return line, quiver, point, time_text
 
 # Run animation
-fps = 20
+fps = 40
 ani = FuncAnimation(fig, update, frames=len(ts), init_func=init,
                    interval=1000/fps, blit=False)
+
+# ani.save("../data/demo2.mp4",
+#          writer='ffmpeg',
+#          fps=fps,
+#          #extra_args=['-vcodec', 'libx264']
+# )
+
 plt.show()
