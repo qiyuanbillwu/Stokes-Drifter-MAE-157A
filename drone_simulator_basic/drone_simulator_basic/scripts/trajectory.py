@@ -45,8 +45,8 @@ dt = 0.01
 # x0, y0, z0 = -1, 1, 0.5
 # x1, y1, z1 = 0, -1, 2
 # x2, y2, z2 = 1, 1, 0.5
-# vx = 3
-# T = 4
+# vx = 2
+# T = 5
 # theta = 0 * np.pi / 180 # angle of the gate
 # t0, t1, t2 = 0, 1.5, 3
 
@@ -72,13 +72,13 @@ dt = 0.01
 
 # ===== -45 degree =====
 # boundary points and conditions
-# x0, y0, z0 = -1, 1, 1
-# x1, y1, z1 = 0, -1, 2.5
-# x2, y2, z2 = 1, 1, 1
-# vx = 2
-# T = 6
-# theta = -45 * np.pi / 180 # angle of the gate
-# t0, t1, t2 = 0, 1.5, 3
+x0, y0, z0 = -1, 1, 0.5
+x1, y1, z1 = 0, -1, 2.3
+x2, y2, z2 = 1, 1, 0.5
+vx = 2
+T = 5
+theta = -45 * np.pi / 180 # angle of the gate
+t0, t1, t2 = 0, 1.5, 3.0
 
 # ===== -90 degree =====
 # boundary points and conditions
@@ -89,6 +89,16 @@ dt = 0.01
 # T = 7
 # theta = -90 * np.pi / 180 # angle of the gate
 # t0, t1, t2 = 0, 1.2, 2.4
+
+# ===== -60 degree =====
+# boundary points and conditions
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2.0
+# x2, y2, z2 = 1, 1, 0.5
+# vx = 2
+# T = 5
+# theta = -60 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== demo1 =====
 # boundary points and conditions
@@ -112,13 +122,13 @@ dt = 0.01
 
 # ===== demo3 =====
 # boundary points and conditions
-x0, y0, z0 = -1, 1, 0.5
-x1, y1, z1 = 0, -1, 2
-x2, y2, z2 = 1, 1, 0.5
-vx = 2
-T = 4
-theta = 0 * np.pi / 180 # angle of the gate
-t0, t1, t2 = 0, 1.5, 3
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2
+# x2, y2, z2 = 1, 1, 0.5
+# vx = 2
+# T = 4
+# theta = 0 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.5, 3
 
 r0 = np.array([x0, y0, z0])
 v0 = np.array([0, 0, 0])
