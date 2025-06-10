@@ -203,7 +203,7 @@ def plotPos(dataOut, trajFunc, titleStr = "Position vs Time"):
     plt.ylim(-2,4)
     plt.show()
 
-def plotPerc(data, dataP):
+def plotPerceivedPosition(data, dataP):
     t = data[:,0]
     x = data[:,1]
     y = data[:,2]
@@ -267,11 +267,11 @@ def animateDronePath(dataOut, trajFunc):
     plt.show()
 
 ## WHERE THE STUFF HAPPENS ========================================================================================
-### SET UP INITIAL STATES & DRONE
-t0, f0, s0 = cleanSlate()
 
+# Define Simulation Parameters
 rate = 1000;
 dt = 1.0/rate;
+tf = 3.0;
 
 rate_sensorUpdate = 100;
 dt_sensorUpdate = 1.0/rate_sensorUpdate;
@@ -279,18 +279,21 @@ dt_sensorUpdate = 1.0/rate_sensorUpdate;
 if (rate_sensorUpdate > rate):
     dt = dt_sensorUpdate
 
-noiseTuple = (0.1,0.5)
+noiseTuple = (0.1,0.1)
+trajFunc = get_state
 
-# Import Values from constants.py
+# Initial state, all zeros
+t0, f0, s0 = cleanSlate()
+
+# Initialize Dynamics
 from constants import g, m, l, Cd, Cl, d, J
-
-# Initialize dynamics
 droneDyn = dynamics.dynamics([g,m,l,Cd,Cl,J], dt)
 
+# Run Simulation
+dataOut, dataP = sim(dt, tf, f0, s0, droneDyn, trajFunc, False, True, noiseTuple)
+
+# Analyze Data
 titleStr = f"Position vs Time | Noise: {noiseTuple[0]*100}cm POS, {noiseTuple[1]*100}% IMU | {rate_sensorUpdate} Hz Sensor Refresh"
-trajFunc = get_state
-dataOut, dataP = sim(dt, 3.0, f0, s0, droneDyn, trajFunc, False, True, noiseTuple)
 plotPos(dataOut, trajFunc, titleStr)
 plotQuat(dataOut)
-
-plotPerc(dataOut,dataP)
+plotPerceivedPosition(dataOut,dataP)
