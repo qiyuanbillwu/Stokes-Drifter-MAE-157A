@@ -2,7 +2,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from trajectory import get_state, get_state_simple
+import matplotlib.animation as animation
 
+'''
 # Update with actual file name in the data director
 file_name = "/data/data_2025-05-22_14-14-14.csv"
 
@@ -174,3 +176,102 @@ plt.plot(t, wy_d_calc, color="blue", linestyle=":", label = 'wx_d_calc')
 plt.plot(t, wz_d_calc, color="green", linestyle=":", label = 'wx_d_calc')
 
 plt.show()
+'''
+
+# Plot Orientation
+def plotQuat(dataOut):
+    tArr = dataOut[:,0];
+    qwArr = dataOut[:,7];
+    qxArr = dataOut[:,8];
+    qyArr = dataOut[:,9];
+    qzArr = dataOut[:,10];
+    plt.plot(tArr, qwArr, label="qx", color = "purple")
+    plt.plot(tArr, qxArr, label="qx", color = "red")
+    plt.plot(tArr, qyArr, label="qy", color = "blue")
+    plt.plot(tArr, qzArr, label="qz", color = "green")
+    plt.plot(tArr, dataOut[:,18], label="qw_des", linestyle="--", color = "purple")
+    plt.plot(tArr, dataOut[:,19], label="qx_des", linestyle="--", color = "red")
+    plt.plot(tArr, dataOut[:,20], label="qy_des", linestyle="--", color = "blue")
+    plt.plot(tArr, dataOut[:,21], label="qz_des", linestyle="--", color = "green")
+    plt.title("Orientation Tracking")
+    plt.legend()
+    plt.show()
+
+# Plot Angular Velocities
+def plotW(dataOut):
+    tArr = dataOut[:,0];
+    wxArr = dataOut[:,11];
+    wyArr = dataOut[:,12];
+    wzArr = dataOut[:,13];
+    plt.plot(tArr, wxArr, label="wx")
+    plt.plot(tArr, wyArr, label="wy")
+    plt.plot(tArr, wzArr, label="wz")
+    plt.plot(tArr, dataOut[:,22], label="omegaX_des", linestyle="--")
+    plt.plot(tArr, dataOut[:,23], label="omegaY_des", linestyle="--")
+    plt.plot(tArr, dataOut[:,24], label="omegaZ_des", linestyle="--")
+    plt.legend()
+    plt.show()
+
+def plotPos(dataOut, trajFunc, titleStr = "Position vs Time"):
+    # --- Position vs Time ---
+    t = dataOut[:,0];
+    x = dataOut[:,1];
+    y = dataOut[:,2];
+    z = dataOut[:,3];
+
+    xd, yd, zd = [], [], []
+    vxdes, vydes, vzdes = [], [], []
+    qwdes,qxdes,qydes,qzdes = [], [], [], []
+    wxdes, wydes, wzdes = [], [], []
+
+    for ti in t:
+        # traj = get_state_simple(ti)
+        traj = trajFunc(ti)
+        xd.append(traj['r'][0])
+        yd.append(traj['r'][1])
+        zd.append(traj['r'][2])
+        vxdes.append(traj['v'][0])
+        vydes.append(traj['v'][1])
+        vzdes.append(traj['v'][2])
+        qwdes.append(traj['q'][0])
+        qxdes.append(traj['q'][1])
+        qydes.append(traj['q'][2])
+        qzdes.append(traj['q'][3])
+        wxdes.append(traj['w'][0])
+        wydes.append(traj['w'][1])
+        wzdes.append(traj['w'][2])
+
+    plt.figure(1)
+    plt.plot(t, x, label='x',color='red')
+    plt.plot(t, y, label='y',color="blue")
+    plt.plot(t, z, label='z',color="green")
+    plt.plot(t, xd, label='xd', linestyle='--',color='red')
+    plt.plot(t, yd, label='yd', linestyle='--',color="blue")
+    plt.plot(t, zd, label='zd', linestyle='--',color="green")
+    plt.xlabel('Time [s]')
+    plt.ylabel('Position [m]')
+    plt.title(titleStr)
+    plt.legend()
+    plt.grid()
+    plt.ylim(-2,4)
+    plt.show()
+
+def plotPerceivedPosition(data, dataP):
+    t = data[:,0]
+    x = data[:,1]
+    y = data[:,2]
+    z = data[:,3]
+    xP = dataP[:,1]
+    yP = dataP[:,2]
+    zP = dataP[:,3]
+    plt.plot(t,x,linestyle='-',color='red', label="x")
+    plt.plot(t,xP,linestyle='--',color='red')
+    plt.plot(t,y,linestyle='-',color='blue',label="y")
+    plt.plot(t,yP,linestyle='--',color='blue')
+    plt.plot(t,z,linestyle='-',color='green',label="z")
+    plt.plot(t,zP,linestyle='--',color='green')
+    plt.title("Percieved Position vs. Actual Position")
+    plt.xlabel("Time [s]")
+    plt.ylabel("Pos [m]")
+    plt.legend()
+    plt.show()
