@@ -72,23 +72,23 @@ dt = 0.01
 
 # ===== -45 degree =====
 # boundary points and conditions
-x0, y0, z0 = -1, 1, 0.5
-x1, y1, z1 = 0, -1, 2.3
-x2, y2, z2 = 1, 1, 0.5
-vx = 2
-T = 5
-theta = -45 * np.pi / 180 # angle of the gate
-t0, t1, t2 = 0, 1.5, 3.0
+# x0, y0, z0 = -1, 1, 0.5
+# x1, y1, z1 = 0, -1, 2.3
+# x2, y2, z2 = 1, 1, 0.5
+# vx = 2
+# T = 5
+# theta = -45 * np.pi / 180 # angle of the gate
+# t0, t1, t2 = 0, 1.5, 3.0
 
 # ===== -90 degree =====
 # boundary points and conditions
-# x0, y0, z0 = -1, 1, 0.5
-# x1, y1, z1 = 0, -1, 2.7
-# x2, y2, z2 = 1, 1, 0.5
-# vx = 2
-# T = 7
-# theta = -90 * np.pi / 180 # angle of the gate
-# t0, t1, t2 = 0, 1.2, 2.4
+x0, y0, z0 = -1, 1, 0.5
+x1, y1, z1 = 0, -1, 2.7
+x2, y2, z2 = 1, 1, 0.5
+vx = 2
+T = 7
+theta = -90 * np.pi / 180 # angle of the gate
+t0, t1, t2 = 0, 1.2, 2.4
 
 # ===== -60 degree =====
 # boundary points and conditions
@@ -108,7 +108,7 @@ t0, t1, t2 = 0, 1.5, 3.0
 # vx = 3
 # T = 4
 # theta = 0 * np.pi / 180 # angle of the gate
-# t0, t1, t2 = 0, 2, 4
+# t0, t1, t2 = 0, 1.5, 3
 
 # ===== demo2 =====
 # boundary points and conditions
